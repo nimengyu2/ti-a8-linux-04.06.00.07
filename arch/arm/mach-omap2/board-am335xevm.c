@@ -58,6 +58,7 @@
 #include <plat/mmc.h>
 #include <plat/emif.h>
 #include <plat/nand.h>
+#include <linux/lierda_debug.h>
 
 #include "board-flash.h"
 #include "cpuidle33xx.h"
@@ -728,7 +729,7 @@ static struct platform_device am335x_evm_keyboard = {
 static void matrix_keypad_init(int evm_id, int profile)
 {
 	int err;
-
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(matrix_keypad_pin_mux);
 	err = platform_device_register(&am335x_evm_keyboard);
 	if (err) {
@@ -929,7 +930,7 @@ static struct pwmss_platform_data  pwm_pdata[3] = {
 static int __init ecap0_init(void)
 {
 	int status = 0;
-
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	if (backlight_enable) {
 		am33xx_register_ecap(0, &pwm_pdata[0]);
 		platform_device_register(&am335x_backlight);
@@ -957,7 +958,7 @@ out:
 
 static void lcdc_init(int evm_id, int profile)
 {
-
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(lcdc_pin_mux);
 
 	if (conf_disp_pll(300000000)) {
@@ -974,6 +975,7 @@ static void lcdc_init(int evm_id, int profile)
 static void tsc_init(int evm_id, int profile)
 {
 	int err;
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 
 	if (gp_evm_revision == GP_EVM_REV_IS_1_1A) {
 		am335x_touchscreen_data.analog_input = 1;
@@ -991,36 +993,42 @@ static void tsc_init(int evm_id, int profile)
 
 static void rgmii1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(rgmii1_pin_mux);
 	return;
 }
 
 static void rgmii2_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(rgmii2_pin_mux);
 	return;
 }
 
 static void mii1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(mii1_pin_mux);
 	return;
 }
 
 static void rmii1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(rmii1_pin_mux);
 	return;
 }
 
 static void usb0_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(usb0_pin_mux);
 	return;
 }
 
 static void usb1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(usb1_pin_mux);
 	return;
 }
@@ -1028,6 +1036,7 @@ static void usb1_init(int evm_id, int profile)
 /* setup uart3 */
 static void uart3_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(uart3_pin_mux);
 	return;
 }
@@ -1035,6 +1044,7 @@ static void uart3_init(int evm_id, int profile)
 /* setup uart2 */
 static void uart2_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(uart2_pin_mux);
 	return;
 }
@@ -1043,6 +1053,7 @@ static void uart2_init(int evm_id, int profile)
 #define HAPTICS_MAX_FREQ 250
 static void haptics_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(haptics_pin_mux);
 	pwm_pdata[2].chan_attrib[1].max_freq = HAPTICS_MAX_FREQ;
 	am33xx_register_ehrpwm(2, &pwm_pdata[2]);
@@ -1186,6 +1197,7 @@ static void evm_nand_init(int evm_id, int profile)
 		{ NULL, 0 },
 	};
 
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(nand_pin_mux);
 	pdata = omap_nand_init(am335x_nand_partitions,
 		ARRAY_SIZE(am335x_nand_partitions), 0, 0,
@@ -1428,6 +1440,7 @@ static struct i2c_board_info am335x_i2c_boardinfo1[] = {
 
 static void i2c1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(i2c1_pin_mux);
 	omap_register_i2c_bus(2, 100, am335x_i2c_boardinfo1,
 			ARRAY_SIZE(am335x_i2c_boardinfo1));
@@ -1440,6 +1453,7 @@ static struct i2c_board_info am335x_i2c_boardinfo2[] = {
 
 static void i2c2_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(i2c2_pin_mux);
 	omap_register_i2c_bus(3, 100, am335x_i2c_boardinfo2,
 			ARRAY_SIZE(am335x_i2c_boardinfo2));
@@ -1449,6 +1463,7 @@ static void i2c2_init(int evm_id, int profile)
 /* Setup McASP 1 */
 static void mcasp1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	/* Configure McASP */
 	setup_pin_mux(mcasp1_pin_mux);
 	am335x_register_mcasp(&am335x_evm_snd_data1, 1);
@@ -1457,6 +1472,7 @@ static void mcasp1_init(int evm_id, int profile)
 
 static void mmc1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(mmc1_pin_mux);
 
 	am335x_mmc[1].mmc = 2;
@@ -1471,6 +1487,7 @@ static void mmc1_init(int evm_id, int profile)
 
 static void mmc2_wl12xx_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(mmc2_wl12xx_pin_mux);
 
 	am335x_mmc[1].mmc = 3;
@@ -1488,6 +1505,7 @@ static void mmc2_wl12xx_init(int evm_id, int profile)
 
 static void uart1_wl12xx_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(uart1_wl12xx_pin_mux);
 }
 
@@ -1520,6 +1538,7 @@ static void wl12xx_init(int evm_id, int profile)
 	struct omap_mmc_platform_data *pdata;
 	int ret;
 
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	/* Register WLAN and BT enable pins based on the evm board revision */
 	if (gp_evm_revision == GP_EVM_REV_IS_1_1A) {
 		am335xevm_wlan_data.wlan_enable_gpio = GPIO_TO_PIN(1, 16);
@@ -1566,6 +1585,7 @@ out:
 
 static void d_can_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	switch (evm_id) {
 	case IND_AUT_MTR_EVM:
 		if ((profile == PROFILE_0) || (profile == PROFILE_1)) {
@@ -1588,6 +1608,7 @@ static void d_can_init(int evm_id, int profile)
 
 static void mmc0_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(mmc0_pin_mux);
 
 	omap2_hsmmc_init(am335x_mmc);
@@ -1605,6 +1626,7 @@ static void tps65217_init(int evm_id, int profile)
 {
 	struct i2c_adapter *adapter;
 	struct i2c_client *client;
+	
 
 	/* I2C1 adapter request */
 	adapter = i2c_get_adapter(1);
@@ -1622,6 +1644,7 @@ static void tps65217_init(int evm_id, int profile)
 
 static void mmc0_no_cd_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(mmc0_no_cd_pin_mux);
 
 	omap2_hsmmc_init(am335x_mmc);
@@ -1632,6 +1655,7 @@ static void mmc0_no_cd_init(int evm_id, int profile)
 /* setup spi0 */
 static void spi0_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(spi0_pin_mux);
 	spi_register_board_info(am335x_spi0_slave_info,
 			ARRAY_SIZE(am335x_spi0_slave_info));
@@ -1641,6 +1665,7 @@ static void spi0_init(int evm_id, int profile)
 /* setup spi1 */
 static void spi1_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(spi1_pin_mux);
 	spi_register_board_info(am335x_spi1_slave_info,
 			ARRAY_SIZE(am335x_spi1_slave_info));
@@ -1717,6 +1742,7 @@ static int am335x_tlk110_phy_fixup(struct phy_device *phydev)
 
 static void profibus_init(int evm_id, int profile)
 {
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(profibus_pin_mux);
 	return;
 }
@@ -1732,6 +1758,20 @@ static struct evm_dev_cfg low_cost_evm_dev_cfg[] = {
 
 /* General Purpose EVM */
 static struct evm_dev_cfg gen_purp_evm_dev_cfg[] = {
+	//{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	{lcdc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{evm_nand_init, DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{uart1_wl12xx_init, DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{uart3_init, DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{rmii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{tsc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+
+#if 0
 	{enable_ecap0,	DEV_ON_DGHTR_BRD, (PROFILE_0 | PROFILE_1 |
 						PROFILE_2 | PROFILE_7) },
 	{lcdc_init,	DEV_ON_DGHTR_BRD, (PROFILE_0 | PROFILE_1 |
@@ -1761,6 +1801,7 @@ static struct evm_dev_cfg gen_purp_evm_dev_cfg[] = {
 	{volume_keys_init,  DEV_ON_DGHTR_BRD, PROFILE_0},
 	{uart2_init,	DEV_ON_DGHTR_BRD, PROFILE_3},
 	{haptics_init,	DEV_ON_DGHTR_BRD, (PROFILE_4)},
+#endif
 	{NULL, 0, 0},
 };
 
@@ -1827,6 +1868,7 @@ static void setup_general_purpose_evm(void)
 	u32 prof_sel = am335x_get_profile_selection();
 	pr_info("The board is general purpose EVM in profile %d\n", prof_sel);
 
+#if 0
 	if (!strncmp("1.1A", config.version, 4)) {
 		gp_evm_revision = GP_EVM_REV_IS_1_1A;
 	} else if (!strncmp("1.0", config.version, 3)) {
@@ -1835,6 +1877,10 @@ static void setup_general_purpose_evm(void)
 		pr_err("Found invalid GP EVM revision, falling back to Rev1.1A");
 		gp_evm_revision = GP_EVM_REV_IS_1_1A;
 	}
+#endif
+	// nmy modify
+	gp_evm_revision = GP_EVM_REV_IS_1_0;
+	lsd_dbg(LSD_DBG,"lierda:nmy modify in setup_general_purpose_evm\n");
 
 	if (gp_evm_revision == GP_EVM_REV_IS_1_0)
 		gigabit_enable = 0;
@@ -1948,6 +1994,7 @@ static void am335x_evm_setup(struct memory_accessor *mem_acc, void *context)
 	int ret;
 	char tmp[10];
 
+#if 0
 	/* 1st get the MAC address from EEPROM */
 	ret = mem_acc->read(mem_acc, (char *)&am335x_mac_addr,
 		EEPROM_MAC_ADDRESS_OFFSET, sizeof(am335x_mac_addr));
@@ -2009,10 +2056,13 @@ static void am335x_evm_setup(struct memory_accessor *mem_acc, void *context)
 		else
 			goto out;
 	}
+#endif
 	/* Initialize cpsw after board detection is completed as board
 	 * information is required for configuring phy address and hence
 	 * should be call only after board detection
 	 */
+	// nmy modify
+	setup_general_purpose_evm();
 	am33xx_cpsw_init(gigabit_enable);
 
 	return;
