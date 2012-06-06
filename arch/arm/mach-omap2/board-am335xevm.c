@@ -1847,12 +1847,21 @@ static struct evm_dev_cfg beaglebone_old_dev_cfg[] = {
 
 /* Beaglebone Rev A3 and after */
 static struct evm_dev_cfg beaglebone_dev_cfg[] = {
+#if 0
 	{tps65217_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{i2c2_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+#endif
+	{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	{lcdc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{evm_nand_init, DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+
 	{NULL, 0, 0},
 };
 
@@ -1929,7 +1938,7 @@ static void setup_beaglebone_old(void)
 	pr_info("The board is a AM335x Beaglebone < Rev A3.\n");
 
 	/* Beagle Bone has Micro-SD slot which doesn't have Write Protect pin */
-	am335x_mmc[0].gpio_wp = -EINVAL;
+	//am335x_mmc[0].gpio_wp = -EINVAL;
 
 	_configure_device(LOW_COST_EVM, beaglebone_old_dev_cfg, PROFILE_NONE);
 
@@ -1946,7 +1955,7 @@ static void setup_beaglebone(void)
 	pr_info("The board is a AM335x Beaglebone.\n");
 
 	/* Beagle Bone has Micro-SD slot which doesn't have Write Protect pin */
-	am335x_mmc[0].gpio_wp = -EINVAL;
+	//am335x_mmc[0].gpio_wp = -EINVAL;
 
 	_configure_device(LOW_COST_EVM, beaglebone_dev_cfg, PROFILE_NONE);
 
@@ -2062,7 +2071,8 @@ static void am335x_evm_setup(struct memory_accessor *mem_acc, void *context)
 	 * should be call only after board detection
 	 */
 	// nmy modify
-	setup_general_purpose_evm();
+	//setup_general_purpose_evm();	
+	setup_beaglebone();
 	am33xx_cpsw_init(gigabit_enable);
 
 	return;
