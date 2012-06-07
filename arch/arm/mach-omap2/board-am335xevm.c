@@ -1758,20 +1758,6 @@ static struct evm_dev_cfg low_cost_evm_dev_cfg[] = {
 
 /* General Purpose EVM */
 static struct evm_dev_cfg gen_purp_evm_dev_cfg[] = {
-	//{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
-	{lcdc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	{evm_nand_init, DEV_ON_BASEBOARD, PROFILE_NONE},
-	//{uart1_wl12xx_init, DEV_ON_BASEBOARD, PROFILE_NONE},
-	//{uart3_init, DEV_ON_BASEBOARD, PROFILE_NONE},
-	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	//{rmii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	//{tsc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	//{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-
-#if 0
 	{enable_ecap0,	DEV_ON_DGHTR_BRD, (PROFILE_0 | PROFILE_1 |
 						PROFILE_2 | PROFILE_7) },
 	{lcdc_init,	DEV_ON_DGHTR_BRD, (PROFILE_0 | PROFILE_1 |
@@ -1801,7 +1787,7 @@ static struct evm_dev_cfg gen_purp_evm_dev_cfg[] = {
 	{volume_keys_init,  DEV_ON_DGHTR_BRD, PROFILE_0},
 	{uart2_init,	DEV_ON_DGHTR_BRD, PROFILE_3},
 	{haptics_init,	DEV_ON_DGHTR_BRD, (PROFILE_4)},
-#endif
+
 	{NULL, 0, 0},
 };
 
@@ -1855,7 +1841,8 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{i2c2_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 #endif
-	{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mmc0_init,DEV_ON_BASEBOARD, PROFILE_NONE},
 	{lcdc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{evm_nand_init, DEV_ON_BASEBOARD, PROFILE_NONE},
 	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
@@ -1877,7 +1864,6 @@ static void setup_general_purpose_evm(void)
 	u32 prof_sel = am335x_get_profile_selection();
 	pr_info("The board is general purpose EVM in profile %d\n", prof_sel);
 
-#if 0
 	if (!strncmp("1.1A", config.version, 4)) {
 		gp_evm_revision = GP_EVM_REV_IS_1_1A;
 	} else if (!strncmp("1.0", config.version, 3)) {
@@ -1886,10 +1872,6 @@ static void setup_general_purpose_evm(void)
 		pr_err("Found invalid GP EVM revision, falling back to Rev1.1A");
 		gp_evm_revision = GP_EVM_REV_IS_1_1A;
 	}
-#endif
-	// nmy modify
-	gp_evm_revision = GP_EVM_REV_IS_1_0;
-	lsd_dbg(LSD_DBG,"lierda:nmy modify in setup_general_purpose_evm\n");
 
 	if (gp_evm_revision == GP_EVM_REV_IS_1_0)
 		gigabit_enable = 0;
@@ -1938,7 +1920,7 @@ static void setup_beaglebone_old(void)
 	pr_info("The board is a AM335x Beaglebone < Rev A3.\n");
 
 	/* Beagle Bone has Micro-SD slot which doesn't have Write Protect pin */
-	//am335x_mmc[0].gpio_wp = -EINVAL;
+	am335x_mmc[0].gpio_wp = -EINVAL;
 
 	_configure_device(LOW_COST_EVM, beaglebone_old_dev_cfg, PROFILE_NONE);
 
@@ -1949,13 +1931,22 @@ static void setup_beaglebone_old(void)
 	am33xx_evmid_fillup(BEAGLE_BONE_OLD);
 }
 
+// add something here
+// nmy modify
 /* BeagleBone after Rev A3 */
 static void setup_beaglebone(void)
 {
 	pr_info("The board is a AM335x Beaglebone.\n");
 
 	/* Beagle Bone has Micro-SD slot which doesn't have Write Protect pin */
-	//am335x_mmc[0].gpio_wp = -EINVAL;
+	// [    1.760855] Waiting for root device /dev/mmcblk0p2...
+	// [    1.804575] mmc0: new high speed SD card at address b368
+	// [    1.811033] mmcblk0: mmc0:b368 SD    1.89 GiB (ro)
+	// [    1.817778]  mmcblk0: p1 p2
+	// [    1.874955] VFS: Cannot open root device "mmcblk0p2" or unknown-block(179,2)
+	// [    1.882385] Please append a correct "root=" boot option; here are the available partitions:
+	// 如果这里不开启，则会报上面的错误
+	am335x_mmc[0].gpio_wp = -EINVAL;
 
 	_configure_device(LOW_COST_EVM, beaglebone_dev_cfg, PROFILE_NONE);
 
@@ -1963,6 +1954,11 @@ static void setup_beaglebone(void)
 	regulator_has_full_constraints();
 
 	/* Fill up global evmid */
+	// 如果这里不设定这个evmid，则网络不通
+	//  enter filesystem,and 
+	// ifconfig eth0 up;ifconfig eth0 192.168.1.30 
+	// 此时可以发现网络phy芯片，可以读取到id和发现网络已经连接上了
+	// 但是使用ping的时候，ping不同
 	am33xx_evmid_fillup(BEAGLE_BONE_A3);
 }
 

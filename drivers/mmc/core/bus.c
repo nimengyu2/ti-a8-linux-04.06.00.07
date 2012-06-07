@@ -27,6 +27,8 @@
 
 #define to_mmc_driver(d)	container_of(d, struct mmc_driver, drv)
 
+extern unsigned char g_u8_mmc_sd_present;
+
 static ssize_t mmc_type_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -309,6 +311,8 @@ int mmc_add_card(struct mmc_card *card)
 			(mmc_card_highspeed(card) ? "high speed " : ""),
 			mmc_card_ddr_mode(card) ? "DDR " : "",
 			type, card->rca);
+		// nmy add
+		g_u8_mmc_sd_present = 1;
 	}
 
 #ifdef CONFIG_DEBUG_FS
@@ -341,6 +345,8 @@ void mmc_remove_card(struct mmc_card *card)
 		} else {
 			pr_info("%s: card %04x removed\n",
 				mmc_hostname(card->host), card->rca);
+			// nmy add
+			g_u8_mmc_sd_present = 0;
 		}
 		device_del(&card->dev);
 	}

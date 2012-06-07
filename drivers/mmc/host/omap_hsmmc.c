@@ -40,6 +40,8 @@
 #include <plat/board.h>
 #include <plat/mmc.h>
 #include <plat/cpu.h>
+#include <linux/lierda_debug.h>
+#include <linux/delay.h>
 
 /* OMAP HSMMC Host Controller Registers */
 #define OMAP_HSMMC_SYSCONFIG	0x0010
@@ -1311,31 +1313,134 @@ static void omap_hsmmc_detect(struct work_struct *work)
 		return;
 
 	sysfs_notify(&host->mmc->class_dev.kobj, NULL, "cover_switch");
-
 	if (slot->card_detect)
+	{
 		carddetect = slot->card_detect(host->dev, host->slot_id);
-	else {
+	}	
+	else 
+	{
 		omap_hsmmc_protect_card(host);
 		carddetect = -ENOSYS;
 	}
 
+// nmy modify
+#if 0
 	if (carddetect)
+	{
 		mmc_detect_change(host->mmc, (HZ * 200) / 1000);
+	}	
 	else
+	{
 		mmc_detect_change(host->mmc, (HZ * 50) / 1000);
+	}
+#endif
 }
 
 /*
  * ISR for handling card insertion and removal
  */
+// 指示sd卡是否被识别，在core/bus.c中被设定，这里仅仅读取信息
+unsigned char g_u8_mmc_sd_present = 0;
+// 定时器，定时扫描sd卡的cd引脚
+struct timer_list my_timer;
+// 暂时保存sd卡的设备，存在隐患，如果是mmc1等其他mmc，则会搞错，带修正
+// 本系统中应该没有问题
+struct omap_hsmmc_host *my_host = NULL;
+// 检测到插卡时间计数
+int g_s8_mmc_sd_insert_cnt = 0;
+// 检测到无卡时间计数
+int g_s8_mmc_sd_outsert_cnt = 0;
+
+// 定时器调用函数
+void my_function(unsigned long data)
+{
+	int carddetect;
+	struct omap_mmc_slot_data *slot;
+	int mmc_sd_value = 0;
+
+	//struct omap_hsmmc_host *host = (struct omap_hsmmc_host *)data;
+	// 直接调用不稳定，插拔几次就不行
+	//schedule_work(&host->mmc_carddetect_work);
+	del_timer(&my_timer);
+	// 定时10个节拍时间 这里是10ms一次
+	my_timer.expires = jiffies + 30;
+	my_timer.data = (unsigned long)my_host;
+	my_timer.function = my_function;
+	add_timer(&my_timer);
+
+	mmc_sd_value = gpio_get_value(0*32+6);
+	if(mmc_sd_value == 0)
+	{
+		g_s8_mmc_sd_insert_cnt++;
+		g_s8_mmc_sd_outsert_cnt = 0;
+	}
+	else
+	{
+		g_s8_mmc_sd_outsert_cnt++;
+		g_s8_mmc_sd_insert_cnt = 0;
+	}
+	
+#if 0
+	if(my_host != NULL)
+	{
+		slot = &mmc_slot(my_host);
+		if(slot->card_detect)
+		{
+			carddetect = slot->card_detect(my_host->dev, my_host->slot_id);
+			if(carddetect == 0)
+			{
+				g_s8_mmc_sd_insert_cnt++;
+				g_s8_mmc_sd_outsert_cnt = 0;
+			}
+			else
+			{
+				g_s8_mmc_sd_outsert_cnt++;
+				g_s8_mmc_sd_insert_cnt = 0;
+			}
+		}
+	}	
+#endif
+
+	if(g_s8_mmc_sd_insert_cnt >= 2)
+	{
+		//g_u8_mmc_sd_insert_cnt = 3;
+		g_s8_mmc_sd_insert_cnt = 0;
+		if(g_u8_mmc_sd_present == 0)
+		{
+			g_s8_mmc_sd_insert_cnt = -2;
+			// 调度检测
+			mmc_detect_change(my_host->mmc, 1);
+			printk("in detcet\n");
+		}	
+	}
+	if(g_s8_mmc_sd_outsert_cnt >= 2)
+	{
+		//g_u8_mmc_sd_insert_cnt = 3;
+		g_s8_mmc_sd_outsert_cnt = 0;
+		if(g_u8_mmc_sd_present == 1)
+		{
+			g_s8_mmc_sd_outsert_cnt = -2;
+			// 调度检测
+			mmc_detect_change(my_host->mmc, 1);
+			printk("out detcet\n");
+		}	
+	}
+
+	//printk("i am alive,g_u8_mmc_sd_present=%d,mmc_sd_value=%d\n",g_u8_mmc_sd_present,mmc_sd_value);
+}
+
+
 static irqreturn_t omap_hsmmc_cd_handler(int irq, void *dev_id)
 {
 	struct omap_hsmmc_host *host = (struct omap_hsmmc_host *)dev_id;
+	my_host = (struct omap_hsmmc_host *)dev_id;
 
 	if (host->suspended)
+	{
 		return IRQ_HANDLED;
+	}	
+	
 	schedule_work(&host->mmc_carddetect_work);
-
 	return IRQ_HANDLED;
 }
 
@@ -1897,7 +2002,6 @@ static int __init omap_hsmmc_probe(struct platform_device *pdev)
 	struct omap_hsmmc_host *host = NULL;
 	struct resource *res, *dma_tx, *dma_rx;
 	int ret, irq;
-
 	if (pdata == NULL) {
 		dev_err(&pdev->dev, "Platform Data is missing\n");
 		return -ENXIO;
@@ -2075,7 +2179,12 @@ static int __init omap_hsmmc_probe(struct platform_device *pdev)
 			mmc_hostname(mmc), host);
 	if (ret) {
 		dev_dbg(mmc_dev(host->mmc), "Unable to grab HSMMC IRQ\n");
+		lsd_mmc_dbg(LSD_ERR,"unable grab HSMMC IRQ\n");
 		goto err_irq;
+	}
+	else
+	{
+		lsd_mmc_dbg(LSD_OK,"grab HSMMC IRQ\n");
 	}
 
 	if (pdata->init != NULL) {
@@ -2104,10 +2213,16 @@ static int __init omap_hsmmc_probe(struct platform_device *pdev)
 		if (ret) {
 			dev_dbg(mmc_dev(host->mmc),
 				"Unable to grab MMC CD IRQ\n");
+			lsd_mmc_dbg(LSD_ERR,"unable grab MMC CD IRQ\n");
 			goto err_irq_cd;
 		}
+		lsd_mmc_dbg(LSD_OK,"grab MMC CD IRQ\n");
 		pdata->suspend = omap_hsmmc_suspend_cdirq;
 		pdata->resume = omap_hsmmc_resume_cdirq;
+	}
+	else
+	{
+		lsd_mmc_dbg(LSD_ERR,"not mmc_slot(host).card_detect_irq\n");
 	}
 
 	omap_hsmmc_disable_irq(host);
@@ -2131,6 +2246,15 @@ static int __init omap_hsmmc_probe(struct platform_device *pdev)
 	omap_hsmmc_debugfs(mmc);
 	pm_runtime_mark_last_busy(host->dev);
 	pm_runtime_put_autosuspend(host->dev);
+
+#if 1
+	init_timer(&my_timer);
+	my_timer.expires = jiffies + 5;
+	my_timer.data = (unsigned long)my_host;
+	my_timer.function = my_function;
+	add_timer(&my_timer);
+	lsd_mmc_dbg(LSD_DBG,"mmc time init ok\n");
+#endif
 
 	return 0;
 
