@@ -258,6 +258,7 @@ static struct da8xx_panel known_lcd_panels[] = {
 		.pxl_clk = 7833600,
 		.invert_pxl_clk = 0,
 	},
+#if 0
 	/* ThreeFive S9700RTWV35TR */
 	[2] = {
 		.name = "TFC_S9700RTWV35TR_01B",
@@ -272,6 +273,25 @@ static struct da8xx_panel known_lcd_panels[] = {
 		.pxl_clk = 30000000,
 		.invert_pxl_clk = 0,
 	},
+#endif
+#if 1
+// for lsd 7 inch screen
+	/* ThreeFive S9700RTWV35TR */
+	[2] = {
+		.name = "TFC_S9700RTWV35TR_01B",
+		.width = 800,
+		.height = 480,
+		.hfp = 210,
+		.hbp = 6,
+		.hsw = 40,
+		.vfp = 22,
+		.vbp = 3,
+		.vsw = 20,
+		//.pxl_clk = 800*480*60,
+		.pxl_clk = (800+210+46)*(480+45)*60,
+		.invert_pxl_clk = 0,
+	},
+#endif
 };
 
 /* Enable the Raster Engine of the LCD Controller */

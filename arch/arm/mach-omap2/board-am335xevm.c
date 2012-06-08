@@ -125,12 +125,14 @@
 #define am335x_tlk110_phy_init() do { } while (0);
 #endif
 
+#if 0
 static const struct display_panel disp_panel = {
 	WVGA,
 	32,
 	32,
 	COLOR_ACTIVE,
 };
+#endif
 
 /* LCD backlight platform Data */
 #define AM335X_BACKLIGHT_MAX_BRIGHTNESS        100
@@ -148,6 +150,7 @@ static struct platform_pwm_backlight_data am335x_backlight_data = {
 	.pwm_period_ns  = AM335X_PWM_PERIOD_NANO_SECONDS,
 };
 
+#if 0
 static struct lcd_ctrl_config lcd_cfg = {
 	&disp_panel,
 	.ac_bias		= 255,
@@ -164,6 +167,35 @@ static struct lcd_ctrl_config lcd_cfg = {
 	.sync_ctrl		= 1,
 	.raster_order		= 0,
 };
+#endif
+
+#if 1
+// 支持南京鱼跃 10寸液晶和我们的拓普微的液晶
+static const struct display_panel disp_panel = {
+	QVGA,
+	16,
+	16,
+	COLOR_ACTIVE,
+};
+static struct lcd_ctrl_config lcd_cfg = {
+	&disp_panel,
+	.ac_bias		= 255,
+	.ac_bias_intrpt		= 0,
+	.dma_burst_sz		= 16,
+	.bpp			= 16,
+	.fdd			= 255,
+	.tft_alt_mode		= 0,
+	.stn_565_mode		= 0,
+	.mono_8bit_mode		= 0,
+	.invert_line_clock	= 1,
+	.invert_frm_clock	= 1,
+	.sync_edge		= 0,
+	.sync_ctrl		= 1,
+	.raster_order		= 0,
+	.fifo_th		= 6,
+};
+#endif
+
 
 struct da8xx_lcdc_platform_data TFC_S9700RTWV35TR_01B_pdata = {
 	.manu_name		= "ThreeFive",
@@ -1010,6 +1042,7 @@ static void tsc_init(int evm_id, int profile)
 	int err;
 	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 
+#if 0
 	if (gp_evm_revision == GP_EVM_REV_IS_1_1A) {
 		am335x_touchscreen_data.analog_input = 1;
 		pr_info("TSC connected to beta GP EVM\n");
@@ -1017,6 +1050,10 @@ static void tsc_init(int evm_id, int profile)
 		am335x_touchscreen_data.analog_input = 0;
 		pr_info("TSC connected to alpha GP EVM\n");
 	}
+#endif
+	am335x_touchscreen_data.analog_input = 1;
+	pr_info("TSC connected to beta GP EVM\n");
+
 	setup_pin_mux(tsc_pin_mux);
 
 	err = am33xx_register_tsc(&am335x_touchscreen_data);
@@ -1894,7 +1931,7 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-
+	{tsc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{NULL, 0, 0},
 };
 
