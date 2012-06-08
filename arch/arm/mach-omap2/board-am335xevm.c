@@ -201,6 +201,28 @@ static struct snd_platform_data am335x_evm_snd_data1 = {
 	.rxnumevt	= 1,
 };
 
+// nmy add
+static u8 am335x_iis_serializer_direction0[] = {
+	TX_MODE,	RX_MODE,	INACTIVE_MODE,	INACTIVE_MODE,
+	INACTIVE_MODE,	INACTIVE_MODE,	INACTIVE_MODE,	INACTIVE_MODE,
+	INACTIVE_MODE,	INACTIVE_MODE,	INACTIVE_MODE,	INACTIVE_MODE,
+	INACTIVE_MODE,	INACTIVE_MODE,	INACTIVE_MODE,	INACTIVE_MODE,
+};
+
+static struct snd_platform_data am335x_evm_snd_data0 = {
+	.tx_dma_offset	= 0x46000000,	/* McASP0 */
+	.rx_dma_offset	= 0x46000000,
+	.op_mode	= DAVINCI_MCASP_IIS_MODE,
+	.num_serializer	= ARRAY_SIZE(am335x_iis_serializer_direction0),
+	.tdm_slots	= 2,
+	.serial_dir	= am335x_iis_serializer_direction0,
+	.asp_chan_q	= EVENTQ_1,
+	.version	= MCASP_VERSION_3,
+	.txnumevt	= 1,
+	.rxnumevt	= 1,
+};
+
+
 static struct omap2_hsmmc_info am335x_mmc[] __initdata = {
 	{
 		.mmc            = 1,
@@ -583,6 +605,17 @@ static struct pinmux_config mcasp1_pin_mux[] = {
 	{"mii1_col.mcasp1_axr2", OMAP_MUX_MODE4 | AM33XX_PIN_INPUT_PULLDOWN},
 	{"rmii1_refclk.mcasp1_axr3", OMAP_MUX_MODE4 |
 						AM33XX_PIN_INPUT_PULLDOWN},
+	{NULL, 0},
+};
+
+
+// nmy add 
+/* Module pin mux for mcasp0 */
+static struct pinmux_config mcasp0_pin_mux[] = {
+	{"mcasp0_fsx.mcasp0_fsx", 	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
+	{"mcasp0_aclkx.mcasp0_aclkx", 	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
+	{"mcasp0_axr0.mcasp0_axr0", 	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
+	{"mcasp0_axr1.mcasp0_axr1", 	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
 	{NULL, 0},
 };
 
@@ -1423,9 +1456,11 @@ static struct lis3lv02d_platform_data lis331dlh_pdata = {
 };
 
 static struct i2c_board_info am335x_i2c_boardinfo1[] = {
+#if 0
 	{
 		I2C_BOARD_INFO("tlv320aic3x", 0x1b),
 	},
+#endif
 	{
 		I2C_BOARD_INFO("lis331dlh", 0x18),
 		.platform_data = &lis331dlh_pdata,
@@ -1459,6 +1494,16 @@ static void i2c2_init(int evm_id, int profile)
 			ARRAY_SIZE(am335x_i2c_boardinfo2));
 	return;
 }
+
+static void mcasp0_init(int evm_id, int profile)
+{
+	/* Configure McASP */
+	setup_pin_mux(mcasp0_pin_mux);
+	am335x_register_mcasp(&am335x_evm_snd_data0, 0);
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
+	return;
+}
+
 
 /* Setup McASP 1 */
 static void mcasp1_init(int evm_id, int profile)
@@ -1848,6 +1893,7 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 
 	{NULL, 0, 0},
 };
@@ -1951,7 +1997,7 @@ static void setup_beaglebone(void)
 	_configure_device(LOW_COST_EVM, beaglebone_dev_cfg, PROFILE_NONE);
 
 	/* TPS65217 regulator has full constraints */
-	regulator_has_full_constraints();
+	//regulator_has_full_constraints();
 
 	/* Fill up global evmid */
 	// 如果这里不设定这个evmid，则网络不通
@@ -2167,6 +2213,9 @@ static struct tps65910_board am335x_tps65910_info = {
 */
 static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 	{
+		I2C_BOARD_INFO("tlv320aic3x", 0x1b),
+	},
+	{
 		/* Daughter Board EEPROM */
 		I2C_BOARD_INFO("24c256", DAUG_BOARD_I2C_ADDR),
 		.platform_data  = &am335x_daughter_board_eeprom_info,
@@ -2176,6 +2225,7 @@ static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 		I2C_BOARD_INFO("24c256", BASEBOARD_I2C_ADDR),
 		.platform_data  = &am335x_baseboard_eeprom_info,
 	},
+#if 0
 	{
 		I2C_BOARD_INFO("cpld_reg", 0x35),
 	},
@@ -2186,6 +2236,7 @@ static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 		I2C_BOARD_INFO("tps65910", TPS65910_I2C_ID1),
 		.platform_data  = &am335x_tps65910_info,
 	},
+#endif
 };
 
 static struct omap_musb_board_data musb_board_data = {

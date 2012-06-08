@@ -194,6 +194,7 @@ int __init am33xx_register_tsc(struct tsc_data *pdata)
 	return 0;
 }
 
+
 #if defined(CONFIG_SND_AM335X_SOC_EVM) || \
 				defined(CONFIG_SND_AM335X_SOC_EVM_MODULE)
 int __init am335x_register_mcasp(struct snd_platform_data *pdata, int ctrl_nr)
