@@ -693,10 +693,40 @@ static struct pinmux_config mmc1_pin_mux[] = {
 	{NULL, 0},
 };
 
+// nmy modify
+/* Module pin mux for uart2 */
+static struct pinmux_config uart1_pin_mux[] = {
+	{"uart1_rxd.uart1_rxd", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"uart1_txd.uart1_txd", OMAP_MUX_MODE0 | AM33XX_PULL_ENBL},
+	{NULL, 0},
+};
+
+/* Module pin mux for uart2 */
+static struct pinmux_config uart2_pin_mux[] = {
+	{"spi0_sclk.uart2_rxd", OMAP_MUX_MODE1 | AM33XX_SLEWCTRL_SLOW |
+						AM33XX_PIN_INPUT_PULLUP},
+	{"spi0_d0.uart2_txd", OMAP_MUX_MODE1 | AM33XX_PULL_UP |
+						AM33XX_PULL_DISA |
+						AM33XX_SLEWCTRL_SLOW},
+	{NULL, 0},
+};
+
 /* Module pin mux for uart3 */
 static struct pinmux_config uart3_pin_mux[] = {
-	{"spi0_cs1.uart3_rxd", AM33XX_PIN_INPUT_PULLUP},
-	{"ecap0_in_pwm0_out.uart3_txd", AM33XX_PULL_ENBL},
+	{"spi0_cs1.uart3_rxd", OMAP_MUX_MODE1 |AM33XX_PIN_INPUT_PULLUP},
+	{"ecap0_in_pwm0_out.uart3_txd", OMAP_MUX_MODE1 |AM33XX_PULL_ENBL},
+	{NULL, 0},
+};
+
+static struct pinmux_config uart4_pin_mux[] = {
+	{"uart0_ctsn.uart4_rxd", OMAP_MUX_MODE1 | AM33XX_PIN_INPUT_PULLUP},
+	{"uart0_rtsn.uart4_txd", OMAP_MUX_MODE1 | AM33XX_PULL_ENBL},
+	{NULL, 0},
+};
+
+static struct pinmux_config uart5_pin_mux[] = {
+	{"mii1_col.uart5_rxd", OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLUP},
+	{"rmii1_refclk.uart5_txd",OMAP_MUX_MODE3 | AM33XX_PULL_ENBL},
 	{NULL, 0},
 };
 
@@ -712,15 +742,7 @@ static struct pinmux_config d_can_ia_pin_mux[] = {
 	{NULL, 0},
 };
 
-/* Module pin mux for uart2 */
-static struct pinmux_config uart2_pin_mux[] = {
-	{"spi0_sclk.uart2_rxd", OMAP_MUX_MODE1 | AM33XX_SLEWCTRL_SLOW |
-						AM33XX_PIN_INPUT_PULLUP},
-	{"spi0_d0.uart2_txd", OMAP_MUX_MODE1 | AM33XX_PULL_UP |
-						AM33XX_PULL_DISA |
-						AM33XX_SLEWCTRL_SLOW},
-	{NULL, 0},
-};
+
 
 
 /*
@@ -1103,11 +1125,12 @@ static void usb1_init(int evm_id, int profile)
 	return;
 }
 
-/* setup uart3 */
-static void uart3_init(int evm_id, int profile)
+// nmy add
+/* setup uart1 */
+static void uart1_init(int evm_id, int profile)
 {
 	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
-	setup_pin_mux(uart3_pin_mux);
+	setup_pin_mux(uart1_pin_mux);
 	return;
 }
 
@@ -1118,6 +1141,31 @@ static void uart2_init(int evm_id, int profile)
 	setup_pin_mux(uart2_pin_mux);
 	return;
 }
+
+/* setup uart3 */
+static void uart3_init(int evm_id, int profile)
+{
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
+	setup_pin_mux(uart3_pin_mux);
+	return;
+}
+
+/* setup uart4 */
+static void uart4_init(int evm_id, int profile)
+{
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
+	setup_pin_mux(uart4_pin_mux);
+	return;
+}
+
+/* setup uart5 */
+static void uart5_init(int evm_id, int profile)
+{
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
+	setup_pin_mux(uart5_pin_mux);
+	return;
+}
+
 
 /* setup haptics */
 #define HAPTICS_MAX_FREQ 250
@@ -1924,7 +1972,8 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{i2c2_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 #endif
 	//{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
-	{mmc0_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
 	{lcdc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{evm_nand_init, DEV_ON_BASEBOARD, PROFILE_NONE},
 	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
@@ -1932,6 +1981,11 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{tsc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart2_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart3_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart4_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart5_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{NULL, 0, 0},
 };
 
