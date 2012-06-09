@@ -2315,6 +2315,9 @@ static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 		I2C_BOARD_INFO("tlv320aic3x", 0x1b),
 	},
 	{
+		I2C_BOARD_INFO("pcf8563", 0x51),
+	},
+	{
 		/* Daughter Board EEPROM */
 		I2C_BOARD_INFO("24c256", DAUG_BOARD_I2C_ADDR),
 		.platform_data  = &am335x_daughter_board_eeprom_info,
@@ -2324,6 +2327,7 @@ static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 		I2C_BOARD_INFO("24c256", BASEBOARD_I2C_ADDR),
 		.platform_data  = &am335x_baseboard_eeprom_info,
 	},
+	
 #if 0
 	{
 		I2C_BOARD_INFO("cpld_reg", 0x35),
@@ -2537,7 +2541,7 @@ static void __init am335x_evm_init(void)
 	am33xx_cpuidle_init();
 	am33xx_mux_init(board_mux);
 	omap_serial_init();
-	am335x_rtc_init();
+	//am335x_rtc_init();
 	clkout2_enable();
 	am335x_evm_i2c_init();
 	omap_sdrc_init(NULL, NULL);
