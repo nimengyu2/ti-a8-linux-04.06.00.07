@@ -275,10 +275,18 @@ static struct omap2_hsmmc_info am335x_mmc[] __initdata = {
 
 #ifdef CONFIG_OMAP_MUX
 static struct omap_board_mux board_mux[] __initdata = {
+#if 0
 	AM33XX_MUX(I2C0_SDA, OMAP_MUX_MODE0 | AM33XX_SLEWCTRL_SLOW |
 			AM33XX_INPUT_EN | AM33XX_PIN_OUTPUT),
 	AM33XX_MUX(I2C0_SCL, OMAP_MUX_MODE0 | AM33XX_SLEWCTRL_SLOW |
 			AM33XX_INPUT_EN | AM33XX_PIN_OUTPUT),
+#endif
+#if 1
+	AM33XX_MUX(UART1_CTSN, OMAP_MUX_MODE3 | AM33XX_SLEWCTRL_SLOW |
+			AM33XX_INPUT_EN | AM33XX_PIN_OUTPUT),
+	AM33XX_MUX(UART1_RTSN, OMAP_MUX_MODE3 | AM33XX_SLEWCTRL_SLOW |
+			AM33XX_INPUT_EN | AM33XX_PIN_OUTPUT),
+#endif
 	{ .reg_offset = OMAP_MUX_TERMINATOR },
 };
 #else
@@ -966,8 +974,8 @@ static struct pinmux_config mmc2_wl12xx_pin_mux[] = {
 };
 
 static struct pinmux_config uart1_wl12xx_pin_mux[] = {
-	{"uart1_ctsn.uart1_ctsn", OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT},
-	{"uart1_rtsn.uart1_rtsn", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT},
+	//{"uart1_ctsn.uart1_ctsn", OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT},
+	//{"uart1_rtsn.uart1_rtsn", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT},
 	{"uart1_rxd.uart1_rxd", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{"uart1_txd.uart1_txd", OMAP_MUX_MODE0 | AM33XX_PULL_ENBL},
 	{NULL, 0},
@@ -2379,9 +2387,11 @@ static void __init am335x_evm_i2c_init(void)
 	/* Initially assume Low Cost EVM Config */
 	am335x_evm_id = LOW_COST_EVM;
 
-	evm_init_cpld();
+	//evm_init_cpld();
 
-	omap_register_i2c_bus(1, 100, am335x_i2c_boardinfo,
+	//omap_register_i2c_bus(1, 100, am335x_i2c_boardinfo,
+	//			ARRAY_SIZE(am335x_i2c_boardinfo));
+	omap_register_i2c_bus(3, 100, am335x_i2c_boardinfo,
 				ARRAY_SIZE(am335x_i2c_boardinfo));
 }
 
