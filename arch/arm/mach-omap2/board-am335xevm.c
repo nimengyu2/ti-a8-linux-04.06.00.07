@@ -1051,6 +1051,32 @@ out:
 	return ret;
 }
 
+/* Module pin mux for hxzd_gpio */
+static struct pinmux_config hxzd_gpio_pin_mux[] = {
+	{"gpmc_a0.gpio1_16",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a1.gpio1_17",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a2.gpio1_18",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a3.gpio1_19", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a4.gpio1_20", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a5.gpio1_21",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a6.gpio1_22",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a7.gpio1_23",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a8.gpio1_24", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a9.gpio1_25", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a10.gpio1_26", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a11.gpio1_27", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"spi0_d1.gpio0_4", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"spi0_cs0.gpio0_5", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{NULL, 0},
+};
+
+static void hxzd_gpio_init(int evm_id, int profile)
+{
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
+	setup_pin_mux(hxzd_gpio_pin_mux);
+	return;
+}
+
 static void lcdc_init(int evm_id, int profile)
 {
 	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
@@ -1994,6 +2020,7 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{uart3_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{uart4_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{uart5_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{hxzd_gpio_init,DEV_ON_BASEBOARD, PROFILE_NONE},
 	{NULL, 0, 0},
 };
 

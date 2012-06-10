@@ -4,6 +4,13 @@
 
 menu "Character devices"
 
+# nmy modify start
+config AM335x_HXDZ_GPIO 
+        tristate "gpio Support for AM335x GPIO" 
+        help 
+	This option enables support for gpio connected to GPIO lines on am335x boards. 
+# nmy modify end
+
 source "drivers/tty/Kconfig"
 
 config DEVKMEM
