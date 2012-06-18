@@ -259,7 +259,9 @@ static struct omap2_hsmmc_info am335x_mmc[] __initdata = {
 	{
 		.mmc            = 1,
 		.caps           = MMC_CAP_4_BIT_DATA,
-		.gpio_cd        = GPIO_TO_PIN(0, 6),
+		// nmy modify
+		//.gpio_cd        = GPIO_TO_PIN(0, 6),
+		.gpio_cd        = GPIO_TO_PIN(0, 20),
 		.gpio_wp        = GPIO_TO_PIN(3, 18),
 		.ocr_mask       = MMC_VDD_32_33 | MMC_VDD_33_34, /* 3V3 */
 	},
@@ -681,6 +683,8 @@ static struct pinmux_config mmc0_no_cd_pin_mux[] = {
 	{"mmc0_clk.mmc0_clk",	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{"mmc0_cmd.mmc0_cmd",	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{"mcasp0_aclkr.mmc0_sdwp", OMAP_MUX_MODE4 | AM33XX_PIN_INPUT_PULLDOWN},
+	{"xdma_event_intr1.gpio0_20", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	//{"xdma_event_intr1.gpio0_20", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
 	{NULL, 0},
 };
 
@@ -1211,6 +1215,7 @@ static void haptics_init(int evm_id, int profile)
 	am33xx_register_ehrpwm(2, &pwm_pdata[2]);
 }
 
+#if 1
 /* NAND partition information */
 static struct mtd_partition am335x_nand_partitions[] = {
 /* All the partition sizes are listed in terms of NAND block size */
@@ -1250,11 +1255,35 @@ static struct mtd_partition am335x_nand_partitions[] = {
 		.size           = 40 * SZ_128K,
 	},
 	{
-		.name           = "File System",
+		//.name           = "File System",
+		.name           = "rootfs",
 		.offset         = MTDPART_OFS_APPEND,   /* Offset = 0x780000 */
 		.size           = MTDPART_SIZ_FULL,
 	},
 };
+#endif
+
+#if 0
+/* NAND partition information */
+static struct mtd_partition am335x_nand_partitions[] = {
+/* All the partition sizes are listed in terms of NAND block size */
+	{
+		.name           = "boot",
+		.offset         = 0,					/* Offset = 0x00 */
+		.size           = 11 * SZ_128K,
+	},
+	{
+		.name           = "kernel",
+		.offset         = MTDPART_OFS_APPEND,	/* Offset = 0x160000 */
+		.size           = 78 * SZ_128K,
+	},
+	{
+		.name           = "rootfs",
+		.offset         = MTDPART_OFS_APPEND,   /* Offset = 0xB20000 */
+		.size           = MTDPART_SIZ_FULL,
+	}
+};
+#endif
 
 /* SPI 0/1 Platform Data */
 /* SPI flash information */
@@ -1922,6 +1951,7 @@ static struct evm_dev_cfg low_cost_evm_dev_cfg[] = {
 
 /* General Purpose EVM */
 static struct evm_dev_cfg gen_purp_evm_dev_cfg[] = {
+#if 0
 	{enable_ecap0,	DEV_ON_DGHTR_BRD, (PROFILE_0 | PROFILE_1 |
 						PROFILE_2 | PROFILE_7) },
 	{lcdc_init,	DEV_ON_DGHTR_BRD, (PROFILE_0 | PROFILE_1 |
@@ -1951,7 +1981,21 @@ static struct evm_dev_cfg gen_purp_evm_dev_cfg[] = {
 	{volume_keys_init,  DEV_ON_DGHTR_BRD, PROFILE_0},
 	{uart2_init,	DEV_ON_DGHTR_BRD, PROFILE_3},
 	{haptics_init,	DEV_ON_DGHTR_BRD, (PROFILE_4)},
-
+#endif
+	{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	{lcdc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{evm_nand_init, DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{usb0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{usb1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mcasp0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{tsc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart2_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart3_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart4_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{uart5_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	{hxzd_gpio_init,DEV_ON_BASEBOARD, PROFILE_NONE},
 	{NULL, 0, 0},
 };
 
@@ -2033,9 +2077,10 @@ static void setup_low_cost_evm(void)
 
 static void setup_general_purpose_evm(void)
 {
-	u32 prof_sel = am335x_get_profile_selection();
+u32 prof_sel = am335x_get_profile_selection();
 	pr_info("The board is general purpose EVM in profile %d\n", prof_sel);
 
+/*
 	if (!strncmp("1.1A", config.version, 4)) {
 		gp_evm_revision = GP_EVM_REV_IS_1_1A;
 	} else if (!strncmp("1.0", config.version, 3)) {
@@ -2044,6 +2089,10 @@ static void setup_general_purpose_evm(void)
 		pr_err("Found invalid GP EVM revision, falling back to Rev1.1A");
 		gp_evm_revision = GP_EVM_REV_IS_1_1A;
 	}
+*/
+	// nmy modify
+	gp_evm_revision = GP_EVM_REV_IS_1_0;
+	pr_info("lierda:nmy modify in setup_general_purpose_evm \n");
 
 	if (gp_evm_revision == GP_EVM_REV_IS_1_0)
 		gigabit_enable = 0;

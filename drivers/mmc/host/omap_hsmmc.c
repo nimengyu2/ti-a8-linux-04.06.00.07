@@ -1368,7 +1368,7 @@ void my_function(unsigned long data)
 	my_timer.function = my_function;
 	add_timer(&my_timer);
 
-	mmc_sd_value = gpio_get_value(0*32+6);
+	mmc_sd_value = gpio_get_value(0*32+20);
 	if(mmc_sd_value == 0)
 	{
 		g_s8_mmc_sd_insert_cnt++;
@@ -1379,6 +1379,7 @@ void my_function(unsigned long data)
 		g_s8_mmc_sd_outsert_cnt++;
 		g_s8_mmc_sd_insert_cnt = 0;
 	}
+	//lsd_mmc_dbg(LSD_DBG,"mmc_sd_value=%d\n",mmc_sd_value);
 	
 #if 0
 	if(my_host != NULL)
@@ -1405,24 +1406,31 @@ void my_function(unsigned long data)
 	{
 		//g_u8_mmc_sd_insert_cnt = 3;
 		g_s8_mmc_sd_insert_cnt = 0;
-		if(g_u8_mmc_sd_present == 0)
+		if(my_host != NULL)
 		{
-			g_s8_mmc_sd_insert_cnt = -2;
-			// 调度检测
-			mmc_detect_change(my_host->mmc, 1);
-			printk("in detcet\n");
-		}	
+			if(g_u8_mmc_sd_present == 0)
+			{
+				g_s8_mmc_sd_insert_cnt = -2;
+				// 调度检测
+				mmc_detect_change(my_host->mmc, 1);
+				printk("in detcet\n");
+			}
+		}
+			
 	}
 	if(g_s8_mmc_sd_outsert_cnt >= 2)
 	{
 		//g_u8_mmc_sd_insert_cnt = 3;
 		g_s8_mmc_sd_outsert_cnt = 0;
-		if(g_u8_mmc_sd_present == 1)
+		if(my_host != NULL)
 		{
-			g_s8_mmc_sd_outsert_cnt = -2;
-			// 调度检测
-			mmc_detect_change(my_host->mmc, 1);
-			printk("out detcet\n");
+			if(g_u8_mmc_sd_present == 1)
+			{
+				g_s8_mmc_sd_outsert_cnt = -2;
+				// 调度检测
+				mmc_detect_change(my_host->mmc, 1);
+				printk("out detcet\n");
+			}
 		}	
 	}
 
@@ -1439,7 +1447,7 @@ static irqreturn_t omap_hsmmc_cd_handler(int irq, void *dev_id)
 	{
 		return IRQ_HANDLED;
 	}	
-	
+	lsd_mmc_dbg(LSD_DBG,"omap_hsmmc_cd_handler\n");
 	schedule_work(&host->mmc_carddetect_work);
 	return IRQ_HANDLED;
 }
