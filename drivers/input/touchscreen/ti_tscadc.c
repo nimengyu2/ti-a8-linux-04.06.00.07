@@ -78,8 +78,8 @@
 #define TSCADC_STEPCONFIG_FIFO1		(1 << 26)
 #define TSCADC_STEPCONFIG_IDLE_INP	(1 << 22)
 #define TSCADC_STEPCONFIG_OPENDLY	0x018
-//#define TSCADC_STEPCONFIG_SAMPLEDLY	0x88
-#define TSCADC_STEPCONFIG_SAMPLEDLY	0xF8
+#define TSCADC_STEPCONFIG_SAMPLEDLY	0x88
+//#define TSCADC_STEPCONFIG_SAMPLEDLY	0xF8
 #define TSCADC_STEPCONFIG_Z1		(3 << 19)
 #define TSCADC_STEPCHARGE_INM_SWAP	BIT(16)
 #define TSCADC_STEPCHARGE_INM		BIT(15)
@@ -262,7 +262,7 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 	unsigned int		z1 = 0, z2 = 0, z = 0;
 
 // nmy add
-#if 1
+#if 0
 	static unsigned int		temp[3][3];
 	static unsigned int 		temp_cnt = 0;
 	static unsigned int 		temp_all[3] = {0,0,0};
@@ -333,7 +333,7 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 			 * Don't report it to user space.
 			 */
 			if (pen == 0) {
-#if 0
+#if 1
 				if ((diffx < 15) && (diffy < 15)
 						&& (z <= MAX_12BIT)) {
 
@@ -349,6 +349,7 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 				}
 #endif
 
+#if 0
 				if ((diffx < 30) && (diffy < 30)
 					&& (z <= MAX_12BIT)) {
 					// nmy modify
@@ -386,6 +387,7 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 						temp_all[2] = 0;
 					}
 				}
+#endif
 			    
 			}
 		}
