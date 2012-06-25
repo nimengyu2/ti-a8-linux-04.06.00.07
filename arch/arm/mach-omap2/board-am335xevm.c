@@ -1972,8 +1972,8 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{i2c2_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 #endif
 	//{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
-	//{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	{mmc0_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{mmc0_no_cd_init,DEV_ON_BASEBOARD, PROFILE_NONE},
 	{lcdc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{evm_nand_init, DEV_ON_BASEBOARD, PROFILE_NONE},
 	{mii1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
@@ -1983,7 +1983,7 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{tsc_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{uart1_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{uart2_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
-	{uart3_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
+	//{uart3_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{uart4_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{uart5_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{NULL, 0, 0},
@@ -2337,7 +2337,8 @@ static struct omap_musb_board_data musb_board_data = {
 	 * mode[4:7] = USB1PORT's mode
 	 * AM335X beta EVM has USB0 in OTG mode and USB1 in host mode.
 	 */
-	.mode           = (MUSB_HOST << 4) | MUSB_OTG,
+	//.mode           = (MUSB_HOST << 4) | MUSB_OTG,
+	.mode           = (MUSB_HOST << 4) | MUSB_HOST,
 	.power		= 500,
 	.instances	= 1,
 };

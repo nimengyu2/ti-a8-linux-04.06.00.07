@@ -1405,24 +1405,31 @@ void my_function(unsigned long data)
 	{
 		//g_u8_mmc_sd_insert_cnt = 3;
 		g_s8_mmc_sd_insert_cnt = 0;
-		if(g_u8_mmc_sd_present == 0)
+		if(my_host != NULL)
 		{
-			g_s8_mmc_sd_insert_cnt = -2;
-			// 调度检测
-			mmc_detect_change(my_host->mmc, 1);
-			printk("in detcet\n");
-		}	
+			if(g_u8_mmc_sd_present == 0)
+			{
+				g_s8_mmc_sd_insert_cnt = -2;
+				// 调度检测
+				mmc_detect_change(my_host->mmc, 1);
+				printk("in detcet\n");
+			}	
+		}
+		
 	}
 	if(g_s8_mmc_sd_outsert_cnt >= 2)
 	{
 		//g_u8_mmc_sd_insert_cnt = 3;
 		g_s8_mmc_sd_outsert_cnt = 0;
-		if(g_u8_mmc_sd_present == 1)
+		if(my_host != NULL)
 		{
-			g_s8_mmc_sd_outsert_cnt = -2;
-			// 调度检测
-			mmc_detect_change(my_host->mmc, 1);
-			printk("out detcet\n");
+			if(g_u8_mmc_sd_present == 1)
+			{
+				g_s8_mmc_sd_outsert_cnt = -2;
+				// 调度检测
+				mmc_detect_change(my_host->mmc, 1);
+				printk("out detcet\n");
+			}
 		}	
 	}
 
