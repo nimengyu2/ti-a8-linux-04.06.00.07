@@ -951,10 +951,16 @@ static struct pinmux_config profibus_pin_mux[] = {
 
 /* Module pin mux for eCAP0 */
 static struct pinmux_config ecap0_pin_mux[] = {
-	{"ecap0_in_pwm0_out.ecap0_in_pwm0_out",
-		OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT},
+	{"ecap0_in_pwm0_out.ecap0_in_pwm0_out",OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT},
 	{NULL, 0},
 };
+
+static struct pinmux_config ecap_pin_mux[] = {
+	{"i2c0_scl.eCAP1_in_PWM1_out",OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT},
+	{"i2c0_sda.eCAP2_in_PWM2_out",OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT},
+	{NULL, 0},
+};
+
 
 static int backlight_enable;
 
@@ -1005,6 +1011,11 @@ static void enable_ecap0(int evm_id, int profile)
 	setup_pin_mux(ecap0_pin_mux);
 }
 
+static void enable_ecap(int evm_id, int profile)
+{
+	setup_pin_mux(ecap_pin_mux);
+}
+
 /* Setup pwm-backlight */
 static struct platform_device am335x_backlight = {
 	.name           = "pwm-backlight",
@@ -1026,6 +1037,7 @@ static struct pwmss_platform_data  pwm_pdata[3] = {
 	},
 };
 
+#if 0
 static int __init ecap0_init(void)
 {
 	int status = 0;
@@ -1037,6 +1049,19 @@ static int __init ecap0_init(void)
 	return status;
 }
 late_initcall(ecap0_init);
+#endif
+
+static int __init ecap_init(void)
+{
+	int status = 0;
+	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
+
+	am33xx_register_ecap(1, &pwm_pdata[1]);
+	am33xx_register_ecap(2, &pwm_pdata[2]);
+
+	return status;
+}
+late_initcall(ecap_init);
 
 static int __init conf_disp_pll(int rate)
 {
@@ -2065,6 +2090,7 @@ static struct evm_dev_cfg beaglebone_dev_cfg[] = {
 	{uart4_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{uart5_init,	DEV_ON_BASEBOARD, PROFILE_NONE},
 	{hxzd_gpio_init,DEV_ON_BASEBOARD, PROFILE_NONE},
+	{enable_ecap,DEV_ON_BASEBOARD, PROFILE_NONE},
 	{NULL, 0, 0},
 };
 
