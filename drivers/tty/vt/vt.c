@@ -103,6 +103,7 @@
 #include <linux/uaccess.h>
 #include <linux/kdb.h>
 #include <linux/ctype.h>
+#include <linux/lierda_debug.h>
 
 #define MAX_NR_CON_DRIVER 16
 
@@ -177,7 +178,11 @@ int console_blanked;
 
 static int vesa_blank_mode; /* 0:none 1:suspendV 2:suspendH 3:powerdown */
 static int vesa_off_interval;
-static int blankinterval = 10*60;
+
+// nmy modify
+//static int blankinterval = 10*60;
+static int blankinterval = 40;
+
 core_param(consoleblank, blankinterval, int, 0444);
 
 static DECLARE_WORK(console_work, console_callback);
@@ -1516,6 +1521,7 @@ static void setterm_command(struct vc_data *vc)
 			break;
 		case 9:	/* set blanking interval */
 			blankinterval = ((vc->vc_par[1] < 60) ? vc->vc_par[1] : 60) * 60;
+			lsd_dbg(LSD_DBG,"blankinterval=%d,vc->vc_par[1]=%d\n",blankinterval,vc->vc_par[1]);
 			poke_blanked_console();
 			break;
 		case 10: /* set bell frequency in Hz */
@@ -2382,6 +2388,7 @@ rescan_last_byte:
  */
 static void console_callback(struct work_struct *ignored)
 {
+	lsd_dbg(LSD_DBG,"enter func=%s\n",__FUNCTION__);
 	console_lock();
 
 	if (want_console >= 0) {
@@ -2407,6 +2414,7 @@ static void console_callback(struct work_struct *ignored)
 		scrollback_delta = 0;
 	}
 	if (blank_timer_expired) {
+		lsd_dbg(LSD_DBG,"if (blank_timer_expired)\n");
 		do_blank_screen(0);
 		blank_timer_expired = 0;
 	}
@@ -3848,6 +3856,7 @@ static void blank_screen_t(unsigned long dummy)
 		return;
 	}
 	blank_timer_expired = 1;
+	lsd_dbg(LSD_DBG,"enter func=%s\n",__FUNCTION__);
 	schedule_work(&console_work);
 }
 
