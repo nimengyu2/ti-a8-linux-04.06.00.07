@@ -13,6 +13,7 @@
  * GNU General Public License for more details.
  */
 #include <linux/kernel.h>
+#define DEBUG    1 
 #include <linux/platform_device.h>
 #include <linux/seq_file.h>
 #include <linux/slab.h>

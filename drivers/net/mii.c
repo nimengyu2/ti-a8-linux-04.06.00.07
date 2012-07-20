@@ -32,6 +32,7 @@
 #include <linux/netdevice.h>
 #include <linux/ethtool.h>
 #include <linux/mdio.h>
+#include <linux/lierda_debug.h>
 
 static u32 mii_get_an(struct mii_if_info *mii, u16 addr)
 {
@@ -365,7 +366,7 @@ unsigned int mii_check_media (struct mii_if_info *mii,
 	if (!new_carrier) {
 		netif_carrier_off(mii->dev);
 		if (ok_to_print)
-			netdev_info(mii->dev, "link down\n");
+			netdev_info(mii->dev, "LSD link down\n");
 		return 0; /* duplex did not change */
 	}
 
@@ -392,7 +393,7 @@ unsigned int mii_check_media (struct mii_if_info *mii,
 		duplex = 1;
 
 	if (ok_to_print)
-		netdev_info(mii->dev, "link up, %uMbps, %s-duplex, lpa 0x%04X\n",
+		netdev_info(mii->dev, "LSD link up, %uMbps, %s-duplex, lpa 0x%04X\n",
 			    lpa2 & (LPA_1000FULL | LPA_1000HALF) ? 1000 :
 			    media & (ADVERTISE_100FULL | ADVERTISE_100HALF) ?
 			    100 : 10,

@@ -14,6 +14,7 @@
  */
 #include <linux/kernel.h>
 #include <linux/spinlock.h>
+#define DEBUG    1 
 #include <linux/device.h>
 #include <linux/slab.h>
 #include <linux/err.h>

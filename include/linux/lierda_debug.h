@@ -24,7 +24,7 @@
 #define M_LSD_AUDIO_DBG  1
 #define M_LSD_AUDIO_MCBSP  1
 #define M_LSD_FB_DBG  1
-#define M_LSD_ETH_DBG  1
+#define M_LSD_ETH_DBG  0
 #define M_LSD_MMC_DBG  1
 #define M_LSD_USB_DBG  1
 

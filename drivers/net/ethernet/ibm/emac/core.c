@@ -1118,13 +1118,13 @@ static inline int emac_alloc_rx_skb(struct emac_instance *dev, int slot,
 static void emac_print_link_status(struct emac_instance *dev)
 {
 	if (netif_carrier_ok(dev->ndev))
-		printk(KERN_INFO "%s: link is up, %d %s%s\n",
+		printk(KERN_INFO "LSD  %s: link is up, %d %s%s\n",
 		       dev->ndev->name, dev->phy.speed,
 		       dev->phy.duplex == DUPLEX_FULL ? "FDX" : "HDX",
 		       dev->phy.pause ? ", pause enabled" :
 		       dev->phy.asym_pause ? ", asymmetric pause enabled" : "");
 	else
-		printk(KERN_INFO "%s: link is down\n", dev->ndev->name);
+		printk(KERN_INFO "LSD   %s: link is down\n", dev->ndev->name);
 }
 
 /* Process ctx, rtnl_lock semaphore */

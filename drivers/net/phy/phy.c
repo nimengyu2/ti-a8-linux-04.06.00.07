@@ -37,6 +37,7 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 #include <asm/uaccess.h>
+#include <linux/lierda_debug.h>
 
 /**
  * phy_print_status - Convenience function to print out the current phy status
@@ -44,7 +45,7 @@
  */
 void phy_print_status(struct phy_device *phydev)
 {
-	pr_info("PHY: %s - Link is %s", dev_name(&phydev->dev),
+	pr_info("LSD PHY: %s - Link is %s", dev_name(&phydev->dev),
 			phydev->link ? "Up" : "Down");
 	if (phydev->link)
 		printk(KERN_CONT " - %d/%s", phydev->speed,
@@ -389,7 +390,7 @@ EXPORT_SYMBOL(phy_mii_ioctl);
 int phy_start_aneg(struct phy_device *phydev)
 {
 	int err;
-
+	lsd_eth_dbg(LSD_DBG,"phy start auto neg\n");
 	mutex_lock(&phydev->lock);
 
 	if (AUTONEG_DISABLE == phydev->autoneg)
@@ -704,6 +705,7 @@ phy_err:
  */
 void phy_stop(struct phy_device *phydev)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function %s\n",__FUNCTION__);
 	mutex_lock(&phydev->lock);
 
 	if (PHY_HALTED == phydev->state)
@@ -743,7 +745,7 @@ out_unlock:
 void phy_start(struct phy_device *phydev)
 {
 	mutex_lock(&phydev->lock);
-
+	lsd_eth_dbg(LSD_DBG,"enter function %s\n",__FUNCTION__);
 	switch (phydev->state) {
 		case PHY_STARTING:
 			phydev->state = PHY_PENDING;
@@ -772,7 +774,7 @@ void phy_state_machine(struct work_struct *work)
 			container_of(dwork, struct phy_device, state_queue);
 	int needs_aneg = 0;
 	int err = 0;
-
+	
 	mutex_lock(&phydev->lock);
 
 	if (phydev->adjust_state)
@@ -786,7 +788,7 @@ void phy_state_machine(struct work_struct *work)
 			break;
 		case PHY_UP:
 			needs_aneg = 1;
-
+			lsd_eth_dbg(LSD_DBG,"enter function %s,state=PHY_UP\n",__FUNCTION__);
 			phydev->link_timeout = PHY_AN_TIMEOUT;
 
 			break;
@@ -799,6 +801,7 @@ void phy_state_machine(struct work_struct *work)
 			/* If the link is down, give up on
 			 * negotiation for now */
 			if (!phydev->link) {
+				lsd_eth_dbg(LSD_DBG,"enter function %s,state=PHY_AN,and now PHY_NOLINK \n",__FUNCTION__);
 				phydev->state = PHY_NOLINK;
 				netif_carrier_off(phydev->attached_dev);
 				phydev->adjust_link(phydev->attached_dev);
@@ -813,6 +816,7 @@ void phy_state_machine(struct work_struct *work)
 
 			/* If AN is done, we're running */
 			if (err > 0) {
+				lsd_eth_dbg(LSD_DBG,"enter function %s,state=PHY_AN,and now PHY_RUNNING \n",__FUNCTION__);
 				phydev->state = PHY_RUNNING;
 				netif_carrier_on(phydev->attached_dev);
 				phydev->adjust_link(phydev->attached_dev);
@@ -846,17 +850,24 @@ void phy_state_machine(struct work_struct *work)
 			break;
 		case PHY_NOLINK:
 			err = phy_read_status(phydev);
-
 			if (err)
+			{
+				lsd_eth_dbg(LSD_DBG,"phy_read_status(phydev) error\n");
 				break;
-
+			}
 			if (phydev->link) {
+				lsd_eth_dbg(LSD_DBG,"phydev->link is just link now\n");
 				phydev->state = PHY_RUNNING;
 				netif_carrier_on(phydev->attached_dev);
 				phydev->adjust_link(phydev->attached_dev);
 			}
+			else
+			{
+				////lsd_eth_dbg(LSD_DBG,"phydev->link is no link\n");
+			}
 			break;
 		case PHY_FORCING:
+			lsd_eth_dbg(LSD_DBG,"enter function %s,state=PHY_FORCING\n",__FUNCTION__);
 			err = genphy_update_link(phydev);
 
 			if (err)
@@ -875,6 +886,7 @@ void phy_state_machine(struct work_struct *work)
 			phydev->adjust_link(phydev->attached_dev);
 			break;
 		case PHY_RUNNING:
+			////lsd_eth_dbg(LSD_DBG,"enter function %s,state=PHY_RUNNING\n",__FUNCTION__);
 			/* Only register a CHANGE if we are
 			 * polling */
 			if (PHY_POLL == phydev->irq)
@@ -884,12 +896,16 @@ void phy_state_machine(struct work_struct *work)
 			err = phy_read_status(phydev);
 
 			if (err)
+			{
+				lsd_eth_dbg(LSD_DBG,"phy_read_status(phydev) error\n");
 				break;
-
+			}
 			if (phydev->link) {
+				////lsd_eth_dbg(LSD_DBG,"phydev->state just to PHY_RUNNING \n");
 				phydev->state = PHY_RUNNING;
 				netif_carrier_on(phydev->attached_dev);
 			} else {
+				lsd_eth_dbg(LSD_DBG,"phydev->state just to PHY_NOLINK \n");
 				phydev->state = PHY_NOLINK;
 				netif_carrier_off(phydev->attached_dev);
 			}
@@ -908,7 +924,7 @@ void phy_state_machine(struct work_struct *work)
 			}
 			break;
 		case PHY_RESUMING:
-
+			lsd_eth_dbg(LSD_DBG,"enter function %s,state=PHY_RESUMING\n",__FUNCTION__);
 			err = phy_clear_interrupt(phydev);
 
 			if (err)

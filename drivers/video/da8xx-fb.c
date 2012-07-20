@@ -274,7 +274,7 @@ static struct da8xx_panel known_lcd_panels[] = {
 		.invert_pxl_clk = 0,
 	},
 #endif
-#if 0
+#if 1
 // for lsd 7 inch screen
 	/* ThreeFive S9700RTWV35TR */
 	[2] = {
@@ -292,7 +292,7 @@ static struct da8xx_panel known_lcd_panels[] = {
 		.invert_pxl_clk = 0,
 	},
 #endif
-#if 1
+#if 0
 // for 1280*800
 	/* ThreeFive S9700RTWV35TR */
 	[2] = {

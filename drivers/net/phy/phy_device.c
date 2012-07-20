@@ -34,6 +34,7 @@
 #include <asm/io.h>
 #include <asm/irq.h>
 #include <asm/uaccess.h>
+#include <linux/lierda_debug.h>
 
 MODULE_DESCRIPTION("PHY library");
 MODULE_AUTHOR("Andy Fleming");
@@ -718,6 +719,7 @@ EXPORT_SYMBOL(genphy_config_aneg);
 int genphy_update_link(struct phy_device *phydev)
 {
 	int status;
+	int tmp;
 
 	/* Do a fake read */
 	status = phy_read(phydev, MII_BMSR);
@@ -732,10 +734,19 @@ int genphy_update_link(struct phy_device *phydev)
 		return status;
 
 	if ((status & BMSR_LSTATUS) == 0)
+	{
+		//lsd_eth_dbg(LSD_DBG,"phydev->link = 0\n");
 		phydev->link = 0;
+	}	
 	else
+	{
+		//lsd_eth_dbg(LSD_DBG,"phydev->link = 1\n");
 		phydev->link = 1;
+	}
 
+	lsd_eth_dbg(LSD_DBG,"GGGGGG reg0=0x%08x,reg1=0x%08x,reg17=0x%08x\n",
+				phy_read(phydev, 0),phy_read(phydev, 1),phy_read(phydev, 17));
+	phy_write(phydev,17,phy_read(phydev, 17) & (~0x00002000));
 	return 0;
 }
 EXPORT_SYMBOL(genphy_update_link);
@@ -755,12 +766,20 @@ int genphy_read_status(struct phy_device *phydev)
 	int err;
 	int lpa;
 	int lpagb = 0;
+	
 
 	/* Update the link, but return if there
 	 * was an error */
 	err = genphy_update_link(phydev);
 	if (err)
+	{
+		//lsd_eth_dbg(LSD_DBG,"genphy_update_link(phydev) error\n");
 		return err;
+	}
+	else
+	{
+		//lsd_eth_dbg(LSD_DBG,"genphy_update_link(phydev) no error\n");
+	}
 
 	if (AUTONEG_ENABLE == phydev->autoneg) {
 		if (phydev->supported & (SUPPORTED_1000baseT_Half
@@ -885,7 +904,7 @@ static int genphy_config_init(struct phy_device *phydev)
 int genphy_suspend(struct phy_device *phydev)
 {
 	int value;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	mutex_lock(&phydev->lock);
 
 	value = phy_read(phydev, MII_BMCR);
@@ -900,7 +919,7 @@ EXPORT_SYMBOL(genphy_suspend);
 int genphy_resume(struct phy_device *phydev)
 {
 	int value;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	mutex_lock(&phydev->lock);
 
 	value = phy_read(phydev, MII_BMCR);
@@ -926,7 +945,7 @@ static int phy_probe(struct device *dev)
 	struct phy_driver *phydrv;
 	struct device_driver *drv;
 	int err = 0;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	phydev = to_phy_device(dev);
 
 	/* Make sure the driver is held.
@@ -962,7 +981,7 @@ static int phy_probe(struct device *dev)
 static int phy_remove(struct device *dev)
 {
 	struct phy_device *phydev;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	phydev = to_phy_device(dev);
 
 	mutex_lock(&phydev->lock);
@@ -985,7 +1004,7 @@ static int phy_remove(struct device *dev)
 int phy_driver_register(struct phy_driver *new_driver)
 {
 	int retval;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	new_driver->driver.name = new_driver->name;
 	new_driver->driver.bus = &mdio_bus_type;
 	new_driver->driver.probe = phy_probe;
@@ -1028,7 +1047,7 @@ static struct phy_driver genphy_driver = {
 static int __init phy_init(void)
 {
 	int rc;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	rc = mdio_bus_init();
 	if (rc)
 		return rc;
@@ -1042,6 +1061,7 @@ static int __init phy_init(void)
 
 static void __exit phy_exit(void)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	phy_driver_unregister(&genphy_driver);
 	mdio_bus_exit();
 }

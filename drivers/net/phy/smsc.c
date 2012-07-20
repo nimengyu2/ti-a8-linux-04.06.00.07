@@ -22,6 +22,7 @@
 #include <linux/ethtool.h>
 #include <linux/phy.h>
 #include <linux/netdevice.h>
+#include <linux/lierda_debug.h>
 
 #define MII_LAN83C185_ISF 29 /* Interrupt Source Flags */
 #define MII_LAN83C185_IM  30 /* Interrupt Mask */

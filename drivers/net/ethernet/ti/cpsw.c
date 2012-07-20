@@ -17,6 +17,7 @@
 #include <linux/clk.h>
 #include <linux/timer.h>
 #include <linux/module.h>
+#define DEBUG    1 
 #include <linux/platform_device.h>
 #include <linux/if_ether.h>
 #include <linux/etherdevice.h>
@@ -31,6 +32,7 @@
 #include <plat/dmtimer.h>
 #include "cpsw_ale.h"
 #include "davinci_cpdma.h"
+#include <linux/lierda_debug.h>
 
 
 #define CPSW_DEBUG	(NETIF_MSG_HW		| NETIF_MSG_WOL		| \
@@ -276,6 +278,7 @@ static int cpsw_set_coalesce(struct net_device *ndev,
 
 static void cpsw_intr_enable(struct cpsw_priv *priv)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	__raw_writel(0xFF, &priv->ss_regs->tx_en);
 	__raw_writel(0xFF, &priv->ss_regs->rx_en);
 
@@ -285,6 +288,7 @@ static void cpsw_intr_enable(struct cpsw_priv *priv)
 
 static void cpsw_intr_disable(struct cpsw_priv *priv)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	__raw_writel(0, &priv->ss_regs->tx_en);
 	__raw_writel(0, &priv->ss_regs->rx_en);
 
@@ -297,7 +301,7 @@ void cpsw_tx_handler(void *token, int len, int status)
 	struct sk_buff		*skb = token;
 	struct net_device	*ndev = skb->dev;
 	struct cpsw_priv	*priv = netdev_priv(ndev);
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (unlikely(netif_queue_stopped(ndev)))
 		netif_start_queue(ndev);
 	priv->stats.tx_packets++;
@@ -307,11 +311,12 @@ void cpsw_tx_handler(void *token, int len, int status)
 
 void cpsw_rx_handler(void *token, int len, int status)
 {
+
 	struct sk_buff		*skb = token;
 	struct net_device	*ndev = skb->dev;
 	struct cpsw_priv	*priv = netdev_priv(ndev);
 	int			ret = 0;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (unlikely(!netif_running(ndev)) ||
 			unlikely(!netif_carrier_ok(ndev))) {
 		dev_kfree_skb_any(skb);
@@ -349,6 +354,7 @@ void cpsw_rx_handler(void *token, int len, int status)
 
 static void set_cpsw_dmtimer_clear(void)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	omap_dm_timer_write_status(dmtimer_rx, OMAP_TIMER_INT_CAPTURE);
 	omap_dm_timer_write_status(dmtimer_tx, OMAP_TIMER_INT_CAPTURE);
 
@@ -358,7 +364,7 @@ static void set_cpsw_dmtimer_clear(void)
 static irqreturn_t cpsw_interrupt(int irq, void *dev_id)
 {
 	struct cpsw_priv *priv = dev_id;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (likely(netif_running(priv->ndev))) {
 		cpsw_intr_disable(priv);
 		cpsw_disable_irq(priv);
@@ -372,7 +378,7 @@ static int cpsw_poll(struct napi_struct *napi, int budget)
 {
 	struct cpsw_priv	*priv = napi_to_priv(napi);
 	int			num_tx, num_rx;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	num_tx = cpdma_chan_process(priv->txch, 128);
 	num_rx = cpdma_chan_process(priv->rxch, budget);
 
@@ -393,7 +399,7 @@ static int cpsw_poll(struct napi_struct *napi, int budget)
 static inline void soft_reset(const char *module, void __iomem *reg)
 {
 	unsigned long timeout = jiffies + HZ;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	__raw_writel(1, reg);
 	do {
 		cpu_relax();
@@ -409,12 +415,14 @@ static inline void soft_reset(const char *module, void __iomem *reg)
 static void cpsw_set_slave_mac(struct cpsw_slave *slave,
 			       struct cpsw_priv *priv)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	__raw_writel(mac_hi(priv->mac_addr), &slave->regs->sa_hi);
 	__raw_writel(mac_lo(priv->mac_addr), &slave->regs->sa_lo);
 }
 
 static inline u32 cpsw_get_slave_port(struct cpsw_priv *priv, u32 slave_num)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (priv->host_port == 0)
 		return slave_num + 1;
 	else
@@ -429,11 +437,18 @@ static void _cpsw_adjust_link(struct cpsw_slave *slave,
 	u32			slave_port;
 
 	if (!phy)
+	{
+		lsd_eth_dbg(LSD_ERR,"no phy return\n");
 		return;
-
+	}
+	else
+	{
+		lsd_eth_dbg(LSD_OK,"have phy return\n");
+	}
 	slave_port = cpsw_get_slave_port(priv, slave->slave_num);
 
 	if (phy->link) {
+		lsd_eth_dbg(LSD_DBG,"phy->link\n");
 		/* enable forwarding */
 		cpsw_ale_control_set(priv->ale, slave_port,
 			ALE_PORT_STATE, ALE_PORT_STATE_FORWARD);
@@ -452,6 +467,7 @@ static void _cpsw_adjust_link(struct cpsw_slave *slave,
 			mac_control |= (BIT(15)|BIT(16));
 		*link = true;
 	} else {
+		lsd_eth_dbg(LSD_DBG,"phy->link = 0\n");
 		cpsw_ale_control_set(priv->ale, slave_port,
 			     ALE_PORT_STATE, ALE_PORT_STATE_DISABLE);
 		mac_control = 0;
@@ -469,7 +485,7 @@ static void cpsw_adjust_link(struct net_device *ndev)
 {
 	struct cpsw_priv	*priv = netdev_priv(ndev);
 	bool			link = false;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	for_each_slave(priv, _cpsw_adjust_link, priv, &link);
 
 	if (link) {
@@ -501,7 +517,7 @@ static ssize_t cpsw_hw_stats_show(struct device *dev,
 	struct cpsw_priv	*priv = netdev_priv(ndev);
 	int			len = 0;
 	struct cpdma_chan_stats	dma_stats;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 #define show_stat(x) do {						\
 	len += __show_stat(buf + len, SZ_4K - len, #x,			\
 			   __raw_readl(&priv->hw_stats->x));		\
@@ -561,7 +577,7 @@ static void cpsw_set_phy_config(struct cpsw_priv *priv, struct phy_device *phy)
 	int phy_addr = 0;
 	u16 val = 0;
 	u16 tmp = 0;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (!phy)
 		return;
 
@@ -620,7 +636,7 @@ static void cpsw_slave_open(struct cpsw_slave *slave, struct cpsw_priv *priv)
 {
 	char name[32];
 	u32 slave_port;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	sprintf(name, "slave-%d", slave->slave_num);
 
 	soft_reset(name, &slave->sliver->soft_reset);
@@ -655,6 +671,7 @@ static void cpsw_slave_open(struct cpsw_slave *slave, struct cpsw_priv *priv)
 
 static void cpsw_init_host_port(struct cpsw_priv *priv)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	/* soft reset the controller and initialize ale */
 	soft_reset("cpsw", &priv->regs->soft_reset);
 	cpsw_ale_start(priv->ale);
@@ -682,6 +699,7 @@ static int cpsw_ndo_open(struct net_device *ndev)
 	int i, ret;
 	u32 reg;
 
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	cpsw_intr_disable(priv);
 	netif_carrier_off(ndev);
 
@@ -766,7 +784,8 @@ static int cpsw_ndo_open(struct net_device *ndev)
 }
 
 static void cpsw_slave_stop(struct cpsw_slave *slave, struct cpsw_priv *priv)
-{
+{	
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (!slave->phy)
 		return;
 	phy_stop(slave->phy);
@@ -777,7 +796,7 @@ static void cpsw_slave_stop(struct cpsw_slave *slave, struct cpsw_priv *priv)
 static int cpsw_ndo_stop(struct net_device *ndev)
 {
 	struct cpsw_priv *priv = netdev_priv(ndev);
-
+	lsd_eth_dbg(LSD_DBG,"shutting down cpsw device\n");
 	msg(info, ifdown, "shutting down cpsw device\n");
 	cpsw_intr_disable(priv);
 	cpdma_ctlr_int_ctrl(priv->dma, false);
@@ -803,7 +822,7 @@ static netdev_tx_t cpsw_ndo_start_xmit(struct sk_buff *skb,
 {
 	struct cpsw_priv *priv = netdev_priv(ndev);
 	int ret;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	ndev->trans_start = jiffies;
 
 	ret = skb_padto(skb, CPSW_MIN_PACKET_SIZE);
@@ -828,6 +847,7 @@ fail:
 
 static void cpsw_ndo_change_rx_flags(struct net_device *ndev, int flags)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	/*
 	 * The switch cannot operate in promiscuous mode without substantial
 	 * headache.  For promiscuous mode to work, we would need to put the
@@ -853,7 +873,7 @@ static int cpsw_ndo_set_mac_address(struct net_device *ndev, void *p)
 {
 	struct cpsw_priv *priv = netdev_priv(ndev);
 	struct sockaddr *addr = (struct sockaddr *)p;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (!is_valid_ether_addr(addr->sa_data))
 		return -EADDRNOTAVAIL;
 
@@ -872,7 +892,7 @@ static int cpsw_ndo_set_mac_address(struct net_device *ndev, void *p)
 static void cpsw_ndo_tx_timeout(struct net_device *ndev)
 {
 	struct cpsw_priv *priv = netdev_priv(ndev);
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	msg(err, tx_err, "transmit timeout, restarting dma");
 	priv->stats.tx_errors++;
 	cpsw_intr_disable(priv);
@@ -886,6 +906,7 @@ static void cpsw_ndo_tx_timeout(struct net_device *ndev)
 
 static struct net_device_stats *cpsw_ndo_get_stats(struct net_device *ndev)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	struct cpsw_priv *priv = netdev_priv(ndev);
 	return &priv->stats;
 }
@@ -894,7 +915,7 @@ static struct net_device_stats *cpsw_ndo_get_stats(struct net_device *ndev)
 static void cpsw_ndo_poll_controller(struct net_device *ndev)
 {
 	struct cpsw_priv *priv = netdev_priv(ndev);
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	cpsw_intr_disable(priv);
 	cpdma_ctlr_int_ctrl(priv->dma, false);
 	cpsw_interrupt(ndev->irq, priv);
@@ -916,7 +937,7 @@ static int cpsw_get_coalesce(struct net_device *ndev,
 				struct ethtool_coalesce *coal)
 {
 	struct cpsw_priv *priv = netdev_priv(ndev);
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	coal->rx_coalesce_usecs = priv->coal_intvl;
 	return 0;
 }
@@ -938,7 +959,7 @@ static int cpsw_set_coalesce(struct net_device *ndev,
 	u32 prescale = 0;
 	u32 addnl_dvdr = 1;
 	u32 coal_intvl = 0;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (!coal->rx_coalesce_usecs)
 		return -EINVAL;
 
@@ -1015,6 +1036,7 @@ static u32 cpsw_get_msglevel(struct net_device *ndev)
 
 static void cpsw_set_msglevel(struct net_device *ndev, u32 value)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	struct cpsw_priv *priv = netdev_priv(ndev);
 	priv->msg_enable = value;
 }
@@ -1049,7 +1071,7 @@ static int __devinit cpsw_probe(struct platform_device *pdev)
 	void __iomem			*regs;
 	struct resource			*res;
 	int ret = 0, i, k = 0;
-
+	lsd_eth_dbg(LSD_DBG,"enter function %s\n",__FUNCTION__);
 	if (!data) {
 		pr_err("cpsw: platform data missing\n");
 		return -ENODEV;
@@ -1316,6 +1338,7 @@ static int __devexit cpsw_remove(struct platform_device *pdev)
 	struct net_device *ndev = platform_get_drvdata(pdev);
 	struct cpsw_priv *priv = netdev_priv(ndev);
 
+	lsd_eth_dbg(LSD_DBG,"enter function %s\n",__FUNCTION__);
 	msg(notice, probe, "removing device\n");
 	platform_set_drvdata(pdev, NULL);
 
@@ -1344,8 +1367,16 @@ static int cpsw_suspend(struct device *dev)
 	struct net_device	*ndev = platform_get_drvdata(pdev);
 	struct cpsw_priv *priv = netdev_priv(ndev);
 
+	lsd_eth_dbg(LSD_DBG,"enter function %s\n",__FUNCTION__);
 	if (netif_running(ndev))
+	{
 		cpsw_ndo_stop(ndev);
+		lsd_eth_dbg(LSD_DBG,"netif_running(ndev) \n");
+	}
+	else
+	{	
+		lsd_eth_dbg(LSD_DBG,"not netif_running(ndev) \n");
+	}
 
 	soft_reset("cpsw", &priv->regs->soft_reset);
 	soft_reset("sliver 0", &priv->slaves[0].sliver->soft_reset);
@@ -1382,12 +1413,14 @@ static struct platform_driver cpsw_driver = {
 
 static int __init cpsw_init(void)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function %s\n",__FUNCTION__);
 	return platform_driver_register(&cpsw_driver);
 }
 late_initcall(cpsw_init);
 
 static void __exit cpsw_exit(void)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function %s\n",__FUNCTION__);
 	platform_driver_unregister(&cpsw_driver);
 }
 module_exit(cpsw_exit);

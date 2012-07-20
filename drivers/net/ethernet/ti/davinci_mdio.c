@@ -26,6 +26,7 @@
  */
 #include <linux/module.h>
 #include <linux/kernel.h>
+#define DEBUG    1 
 #include <linux/platform_device.h>
 #include <linux/delay.h>
 #include <linux/sched.h>
@@ -35,6 +36,7 @@
 #include <linux/err.h>
 #include <linux/io.h>
 #include <linux/davinci_emac.h>
+#include <linux/lierda_debug.h>
 
 /*
  * This timeout definition is a worst-case ultra defensive measure against
@@ -100,7 +102,7 @@ struct davinci_mdio_data {
 static void __davinci_mdio_reset(struct davinci_mdio_data *data)
 {
 	u32 mdio_in, div, mdio_out_khz, access_time;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	mdio_in = clk_get_rate(data->clk);
 	div = (mdio_in / data->pdata.bus_freq) - 1;
 	if (div > CONTROL_MAX_DIV)
@@ -133,7 +135,7 @@ static int davinci_mdio_reset(struct mii_bus *bus)
 {
 	struct davinci_mdio_data *data = bus->priv;
 	u32 phy_mask, ver;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	__davinci_mdio_reset(data);
 
 	/* wait for scan logic to settle */
@@ -208,6 +210,7 @@ static int davinci_mdio_read(struct mii_bus *bus, int phy_id, int phy_reg)
 	struct davinci_mdio_data *data = bus->priv;
 	u32 reg;
 	int ret;
+	//lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 
 	if (phy_reg & ~PHY_REG_MASK || phy_id & ~PHY_ID_MASK)
 		return -EINVAL;
@@ -253,6 +256,7 @@ static int davinci_mdio_write(struct mii_bus *bus, int phy_id,
 	struct davinci_mdio_data *data = bus->priv;
 	u32 reg;
 	int ret;
+	
 
 	if (phy_reg & ~PHY_REG_MASK || phy_id & ~PHY_ID_MASK)
 		return -EINVAL;
@@ -275,6 +279,7 @@ static int davinci_mdio_write(struct mii_bus *bus, int phy_id,
 			break;
 
 		__raw_writel(reg, &data->regs->user[0].access);
+		lsd_eth_dbg(LSD_DBG,"wwwwww reg=0x%08x,data=0x%08x\n",reg,&data->regs->user[0].access);
 
 		ret = wait_for_user_access(data);
 		if (ret == -EAGAIN)
@@ -295,7 +300,7 @@ static int __devinit davinci_mdio_probe(struct platform_device *pdev)
 	struct resource *res;
 	struct phy_device *phy;
 	int ret, addr;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	data = kzalloc(sizeof(*data), GFP_KERNEL);
 	if (!data) {
 		dev_err(dev, "failed to alloc device data\n");
@@ -390,7 +395,7 @@ static int __devexit davinci_mdio_remove(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct davinci_mdio_data *data = dev_get_drvdata(dev);
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	if (data->bus)
 		mdiobus_free(data->bus);
 
@@ -437,7 +442,7 @@ static int davinci_mdio_suspend(struct device *dev)
 {
 	struct davinci_mdio_data *data = dev_get_drvdata(dev);
 	u32 ctrl;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	spin_lock(&data->lock);
 
 	/* shutdown the scan state machine */
@@ -459,7 +464,7 @@ static int davinci_mdio_resume(struct device *dev)
 {
 	struct davinci_mdio_data *data = dev_get_drvdata(dev);
 	u32 ctrl;
-
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	spin_lock(&data->lock);
 	if (data->clk)
 		clk_enable(data->clk);
@@ -494,13 +499,15 @@ static struct platform_driver davinci_mdio_driver = {
 };
 
 static int __init davinci_mdio_init(void)
-{
+{	
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	return platform_driver_register(&davinci_mdio_driver);
 }
 device_initcall(davinci_mdio_init);
 
 static void __exit davinci_mdio_exit(void)
 {
+	lsd_eth_dbg(LSD_DBG,"enter function=%s\n",__FUNCTION__);
 	platform_driver_unregister(&davinci_mdio_driver);
 }
 module_exit(davinci_mdio_exit);
