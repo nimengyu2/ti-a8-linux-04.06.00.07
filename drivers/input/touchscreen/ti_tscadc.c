@@ -334,7 +334,7 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 			 */
 			if (pen == 0) {
 #if 1
-				if ((diffx < 15) && (diffy < 15)
+				if ((diffx < 13) && (diffy < 13)
 						&& (z <= MAX_12BIT)) {
 
 					input_report_abs(input_dev, ABS_X,
