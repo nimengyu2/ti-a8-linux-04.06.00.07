@@ -27,6 +27,7 @@
 #include <linux/input/ti_tscadc.h>
 #include <linux/delay.h>
 #include <linux/pm_runtime.h>
+#include <linux/jiffies.h>
 
 #define TSCADC_REG_IRQEOI		0x020
 #define TSCADC_REG_RAWIRQSTATUS		0x024
@@ -262,10 +263,14 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 	unsigned int		z1 = 0, z2 = 0, z = 0;
 
 // nmy add
-#if 0
-	static unsigned int		temp[3][3];
+#if 1
+	static unsigned int		temp[30][3];
 	static unsigned int 		temp_cnt = 0;
-	static unsigned int 		temp_all[3] = {0,0,0};
+	static unsigned int 		temp_all[30] = {0,0,0};
+	int jj = 0;
+	static unsigned long t_now = 0;
+	static unsigned long t_last = 0;
+	static long t_diff = 0;
 #endif
 
 	status = tscadc_readl(ts_dev, TSCADC_REG_IRQSTATUS);
@@ -333,8 +338,8 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 			 * Don't report it to user space.
 			 */
 			if (pen == 0) {
-#if 1
-				if ((diffx < 13) && (diffy < 13)
+#if 0
+				if ((diffx < 15) && (diffy < 15)
 						&& (z <= MAX_12BIT)) {
 
 					input_report_abs(input_dev, ABS_X,
@@ -346,28 +351,70 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 					input_report_key(input_dev, BTN_TOUCH,
 							1);
 					input_sync(input_dev);
+					#if 1
+					printk("x=%d,y=%d,p=%d\n",val_x,val_y,z);
+					#endif
 				}
 #endif
 
-#if 0
+#if 1
 				if ((diffx < 30) && (diffy < 30)
 					&& (z <= MAX_12BIT)) {
 					// nmy modify
-				
-					temp[temp_cnt][0] = val_x;
-					temp[temp_cnt][1] = val_y;
-					temp[temp_cnt][2] = z;
-					temp_all[0] += temp[temp_cnt][0]; 	
-					temp_all[1] += temp[temp_cnt][1]; 
-					temp_all[2] += temp[temp_cnt][2]; 
-					temp_cnt++;
-					if(temp_cnt >= 3)
+					if(temp_cnt == 0)
 					{
-						temp_all[0] = temp_all[0]/3;
-						temp_all[1] = temp_all[1]/3;
-						temp_all[2] = temp_all[2]/3;
+						temp[temp_cnt][0] = val_x;
+						temp[temp_cnt][1] = val_y;
+						temp[temp_cnt][2] = z;	
+					}
+					else
+					{
+						for(jj = temp_cnt;jj > 0; jj--)
+						{
+							if(val_x >= temp[jj-1][0])
+							{
+								temp[jj][0] = val_x;
+								temp[jj][1] = val_y;
+								temp[jj][2] = z;
+								break;
+							}
+							else
+							{
+								temp[jj][0] = temp[jj-1][0]; 
+								temp[jj][1] = temp[jj-1][1]; 
+								temp[jj][2] = temp[jj-1][2]; 
+							}
+						}
+						if(jj == 0)
+						{
+							temp[0][0] = val_x;
+							temp[0][1] = val_y;
+							temp[0][2] = z;
+						}
+					}
+					
+					temp_cnt++;
 
-						#if 0
+					#if 1
+					t_now = jiffies;
+					t_diff = (long)t_now - (long)t_last;
+					t_diff = (t_diff*1000)/HZ;					
+					if(t_diff >= 500)
+					{
+						printk("ts timeout,t_now=0x%08x,t_last=0x%08x,t_diff=%d\n",t_now,
+							t_last,t_diff);						
+						temp_cnt = 0;
+					}	
+					t_last = t_now;		
+					#endif		
+
+					if(temp_cnt >= 5)
+					{
+						temp_all[0] = temp[2][0];
+						temp_all[1] = temp[2][1];
+						temp_all[2] = temp[2][2];
+
+						#if 1
 						printk("x=%d,y=%d,p=%d\n",temp_all[0],temp_all[1],temp_all[2]);
 						#endif
 
@@ -577,6 +624,7 @@ err_free_mem:
 
 static int __devexit tscadc_remove(struct platform_device *pdev)
 {
+#if 1
 	struct tscadc		*ts_dev = platform_get_drvdata(pdev);
 	struct resource		*res;
 
@@ -594,11 +642,13 @@ static int __devexit tscadc_remove(struct platform_device *pdev)
 
 	device_init_wakeup(&pdev->dev, 0);
 	platform_set_drvdata(pdev, NULL);
+#endif
 	return 0;
 }
 
 static int tscadc_suspend(struct platform_device *pdev, pm_message_t state)
 {
+#if 0
 	struct tscadc *ts_dev = platform_get_drvdata(pdev);
 	unsigned int idle;
 
@@ -616,13 +666,14 @@ static int tscadc_suspend(struct platform_device *pdev, pm_message_t state)
 	tscadc_writel(ts_dev, TSCADC_REG_CTRL, idle);
 
 	pm_runtime_put_sync(&pdev->dev);
-
+#endif
 	return 0;
 
 }
 
 static int tscadc_resume(struct platform_device *pdev)
 {
+#if 0
 	struct tscadc *ts_dev = platform_get_drvdata(pdev);
 	unsigned int restore;
 
@@ -642,7 +693,7 @@ static int tscadc_resume(struct platform_device *pdev)
 	restore = tscadc_readl(ts_dev, TSCADC_REG_CTRL);
 	tscadc_writel(ts_dev, TSCADC_REG_CTRL,
 			(restore | TSCADC_CNTRLREG_TSCSSENB));
-
+#endif
 	return 0;
 }
 
