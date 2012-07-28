@@ -401,8 +401,8 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 					t_diff = (t_diff*1000)/HZ;					
 					if(t_diff >= 500)
 					{
-						printk("ts timeout,t_now=0x%08x,t_last=0x%08x,t_diff=%d\n",t_now,
-							t_last,t_diff);						
+						//printk("ts timeout,t_now=0x%08x,t_last=0x%08x,t_diff=%d\n",t_now,
+						//	t_last,t_diff);						
 						temp_cnt = 0;
 					}	
 					t_last = t_now;		
@@ -415,7 +415,7 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 						temp_all[2] = temp[2][2];
 
 						#if 1
-						printk("x=%d,y=%d,p=%d\n",temp_all[0],temp_all[1],temp_all[2]);
+						//printk("x=%d,y=%d,p=%d\n",temp_all[0],temp_all[1],temp_all[2]);
 						#endif
 
 						input_report_abs(input_dev, ABS_X,
