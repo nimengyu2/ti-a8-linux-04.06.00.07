@@ -708,37 +708,40 @@ static struct pinmux_config mmc1_pin_mux[] = {
 // nmy modify
 /* Module pin mux for uart2 */
 static struct pinmux_config uart1_pin_mux[] = {
-	{"uart1_rxd.uart1_rxd", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
-	{"uart1_txd.uart1_txd", OMAP_MUX_MODE0 | AM33XX_PULL_ENBL},
+	//{"uart1_rxd.uart1_rxd", OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	//{"uart1_txd.uart1_txd", OMAP_MUX_MODE0 | AM33XX_PULL_ENBL},
 	{NULL, 0},
 };
 
+
+
+
 /* Module pin mux for uart2 */
 static struct pinmux_config uart2_pin_mux[] = {
-	{"spi0_sclk.uart2_rxd", OMAP_MUX_MODE1 | AM33XX_SLEWCTRL_SLOW |
-						AM33XX_PIN_INPUT_PULLUP},
-	{"spi0_d0.uart2_txd", OMAP_MUX_MODE1 | AM33XX_PULL_UP |
-						AM33XX_PULL_DISA |
-						AM33XX_SLEWCTRL_SLOW},
+	//{"spi0_sclk.uart2_rxd", OMAP_MUX_MODE1 | AM33XX_SLEWCTRL_SLOW |
+	//					AM33XX_PIN_INPUT_PULLUP},
+	//{"spi0_d0.uart2_txd", OMAP_MUX_MODE1 | AM33XX_PULL_UP |
+	//					AM33XX_PULL_DISA |
+	//					AM33XX_SLEWCTRL_SLOW},
 	{NULL, 0},
 };
 
 /* Module pin mux for uart3 */
 static struct pinmux_config uart3_pin_mux[] = {
-	{"spi0_cs1.uart3_rxd", OMAP_MUX_MODE1 |AM33XX_PIN_INPUT_PULLUP},
-	{"ecap0_in_pwm0_out.uart3_txd", OMAP_MUX_MODE1 |AM33XX_PULL_ENBL},
+	//{"spi0_cs1.uart3_rxd", OMAP_MUX_MODE1 |AM33XX_PIN_INPUT_PULLUP},
+	//{"ecap0_in_pwm0_out.uart3_txd", OMAP_MUX_MODE1 |AM33XX_PULL_ENBL},
 	{NULL, 0},
 };
 
 static struct pinmux_config uart4_pin_mux[] = {
-	{"uart0_ctsn.uart4_rxd", OMAP_MUX_MODE1 | AM33XX_PIN_INPUT_PULLUP},
-	{"uart0_rtsn.uart4_txd", OMAP_MUX_MODE1 | AM33XX_PULL_ENBL},
+	//{"uart0_ctsn.uart4_rxd", OMAP_MUX_MODE1 | AM33XX_PIN_INPUT_PULLUP},
+	//{"uart0_rtsn.uart4_txd", OMAP_MUX_MODE1 | AM33XX_PULL_ENBL},
 	{NULL, 0},
 };
 
 static struct pinmux_config uart5_pin_mux[] = {
-	{"mii1_col.uart5_rxd", OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLUP},
-	{"rmii1_refclk.uart5_txd",OMAP_MUX_MODE3 | AM33XX_PULL_ENBL},
+	//{"mii1_col.uart5_rxd", OMAP_MUX_MODE3 | AM33XX_PIN_INPUT_PULLUP},
+	//{"rmii1_refclk.uart5_txd",OMAP_MUX_MODE3 | AM33XX_PULL_ENBL},
 	{NULL, 0},
 };
 
@@ -956,8 +959,8 @@ static struct pinmux_config ecap0_pin_mux[] = {
 };
 
 static struct pinmux_config ecap_pin_mux[] = {
-	{"i2c0_scl.eCAP1_in_PWM1_out",OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT},
-	{"i2c0_sda.eCAP2_in_PWM2_out",OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT},
+	//{"i2c0_scl.eCAP1_in_PWM1_out",OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT},
+	//{"i2c0_sda.eCAP2_in_PWM2_out",OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT},
 	{NULL, 0},
 };
 
@@ -1082,20 +1085,33 @@ out:
 
 /* Module pin mux for hxzd_gpio */
 static struct pinmux_config hxzd_gpio_pin_mux[] = {
-	{"gpmc_a0.gpio1_16",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a1.gpio1_17",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a2.gpio1_18",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a3.gpio1_19", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a4.gpio1_20", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a5.gpio1_21",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a6.gpio1_22",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a7.gpio1_23",  OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a8.gpio1_24", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a9.gpio1_25", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a10.gpio1_26", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"gpmc_a11.gpio1_27", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"spi0_d1.gpio0_4", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
-	{"spi0_cs0.gpio0_5", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	{"gpmc_a0.gpio1_16",  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP}, // pin1
+	{"gpmc_a1.gpio1_17",  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP}, // pin2
+	{"gpmc_a2.gpio1_18",  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a3.gpio1_19", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a4.gpio1_20", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a5.gpio1_21",  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a6.gpio1_22",  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a7.gpio1_23",  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a8.gpio1_24", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a9.gpio1_25", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a10.gpio1_26", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a11.gpio1_27", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"spi0_d1.gpio0_4", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},   // pin13
+	{"spi0_cs0.gpio0_5", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},  // pin14
+	{"i2c0_scl.gpio3_6",OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},  // pwm
+	{"i2c0_sda.gpio3_5",OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},  // pwm
+
+	{"uart1_rxd.gpio0_14", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},   // uart1_rxd
+	{"uart1_txd.gpio0_15", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},   // uart1_txd
+	{"spi0_sclk.gpio0_2", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},  // uart2_rxd
+	{"spi0_d0.gpio0_3", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},   // uart2_txd
+	{"spi0_cs1.gpio0_6", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},    // uart3_rxd
+	{"ecap0_in_pwm0_out.gpio0_7", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},  // uart3_txd
+	{"uart0_ctsn.gpio1_8", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP}, // uart4_rxd
+	{"uart0_rtsn.gpio1_9", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},        // uart4_txd
+	{"mii1_col.gpio3_0", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},   // uart5_rxd
+	{"rmii1_refclk.gpio0_29",OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},       // uart5_txd
 	{NULL, 0},
 };
 
