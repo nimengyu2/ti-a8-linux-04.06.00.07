@@ -2444,8 +2444,7 @@ static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 		/* Baseboard board EEPROM */
 		I2C_BOARD_INFO("24c256", BASEBOARD_I2C_ADDR),
 		.platform_data  = &am335x_baseboard_eeprom_info,
-	},
-	
+	},	
 #if 0
 	{
 		I2C_BOARD_INFO("cpld_reg", 0x35),
