@@ -33,6 +33,7 @@
 #include <plat/nand.h>
 
 #include <plat/sdrc.h>
+#include <linux/lierda_debug.h>
 
 /* GPMC register offsets */
 #define GPMC_REVISION		0x00
@@ -389,8 +390,13 @@ static void gpmc_cs_get_memconf(int cs, u32 *base, u32 *size)
 	*size = (1 << GPMC_SECTION_SHIFT) - (mask << GPMC_CHUNK_SHIFT);
 
 	if (cpu_is_am33xx()) {
+		lsd_nand_dbg(LSD_DBG,"cpu_is_am33xx() is true\n");
 		*base = 0x8000000;
 		*size = 0x10000000;
+	}
+	else
+	{
+		lsd_nand_dbg(LSD_DBG,"cpu_is_am33xx() is false\n");
 	}
 }
 
@@ -718,6 +724,8 @@ static void __devinit gpmc_mem_init(void)
 	int cs;
 	unsigned long boot_rom_space = 0;
 
+	lsd_nand_dbg(LSD_DBG,"Enter function:%s\n",__FUNCTION__);
+
 	/* never allocate the first page, to facilitate bug detection;
 	 * even if we didn't boot from ROM.
 	 */
@@ -725,6 +733,8 @@ static void __devinit gpmc_mem_init(void)
 	/* In apollon the CS0 is mapped as 0x0000 0000 */
 	if (machine_is_omap_apollon())
 		boot_rom_space = 0;
+	lsd_nand_dbg(LSD_DBG,"Enter boot_rom_space=%d,GPMC_CS_NUM=%d,\n",boot_rom_space,GPMC_CS_NUM);
+
 	gpmc->mem_root.start = GPMC_MEM_START + boot_rom_space;
 	gpmc->mem_root.end = GPMC_MEM_END;
 
@@ -733,10 +743,20 @@ static void __devinit gpmc_mem_init(void)
 		u32 base, size;
 
 		if (!gpmc_cs_mem_enabled(cs))
+		{
+			lsd_nand_dbg(LSD_DBG,"cs=%d,gpmc_cs_mem isnot enable\n",cs);			
 			continue;
+		}	
+		else
+		{
+			lsd_nand_dbg(LSD_DBG,"cs=%d,gpmc_cs_mem is enable\n",cs);	
+		}	
 		gpmc_cs_get_memconf(cs, &base, &size);
+		lsd_nand_dbg(LSD_DBG,"cs=%d,base=0x%08x,size=0x%08x\n",cs,base,size);
 		if (gpmc_cs_insert_mem(cs, base, size) < 0)
+		{
 			BUG();
+		}
 	}
 }
 
@@ -750,6 +770,7 @@ static int __devinit gpmc_probe(struct platform_device *pdev)
 	struct gpmc_devices_info *gpmc_device = pdev->dev.platform_data;
 	void *p;
 
+	lsd_nand_dbg(LSD_DBG,"enter func gpmc_probe\n");	
 	/* XXX: This should go away with HWMOD & runtime PM adaptation */
 	gpmc_clk_init(&pdev->dev);
 
@@ -769,6 +790,8 @@ static int __devinit gpmc_probe(struct platform_device *pdev)
 	}
 	gpmc->phys_base = res->start;
 	gpmc->memsize = resource_size(res);
+	lsd_nand_dbg(LSD_DBG,"gpmc->phys_base=0x%08x\n",gpmc->phys_base);
+	lsd_nand_dbg(LSD_DBG,"gpmc->memsize=0x%08x\n",gpmc->memsize);
 
 	if (request_mem_region(gpmc->phys_base,
 		gpmc->memsize, DRIVER_NAME) == NULL) {
@@ -783,6 +806,7 @@ static int __devinit gpmc_probe(struct platform_device *pdev)
 		dev_err(gpmc->dev, "Failed to ioremap memory\n");
 		goto err_remap;
 	}
+	lsd_nand_dbg(LSD_DBG,"gpmc->io_base=0x%08x\n",gpmc->io_base);
 
 	gpmc->ecc_used = -EINVAL;
 	spin_lock_init(&gpmc->mem_lock);
@@ -794,8 +818,12 @@ static int __devinit gpmc_probe(struct platform_device *pdev)
 	gpmc_mem_init();
 
 	for (p = gpmc_device->pdata; p; gpmc_device++, p = gpmc_device->pdata)
+	{
 		if (gpmc_device->flag & GPMC_DEVICE_NAND)
+		{
 			gpmc_nand_init((struct omap_nand_platform_data *) p);
+		}
+	}
 	return 0;
 
 err_remap:

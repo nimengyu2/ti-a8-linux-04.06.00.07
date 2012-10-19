@@ -22,7 +22,7 @@
 #include <plat/nand.h>
 #include <plat/onenand.h>
 #include <plat/tc.h>
-
+#include <linux/lierda_debug.h>
 #include "board-flash.h"
 
 #define REG_FPGA_REV			0x10
@@ -139,6 +139,7 @@ struct omap_nand_platform_data *
 __init omap_nand_init(struct mtd_partition *nand_parts, u8 nr_parts, u8 cs,
 				int nand_type, struct gpmc_timings *gpmc_t)
 {
+	lsd_dbg(LSD_DBG,"Enter omap_nand_init\n");
 	omap_nand_data.cs		= cs;
 	omap_nand_data.parts		= nand_parts;
 	omap_nand_data.nr_parts		= nr_parts;

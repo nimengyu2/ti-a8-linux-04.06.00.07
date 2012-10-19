@@ -287,4 +287,5 @@ smsc911x-$(CONFIG_SMSC911X)		:= gpmc-smsc911x.o
 obj-y					+= $(smsc911x-m) $(smsc911x-y)
 obj-$(CONFIG_ARCH_OMAP4)		+= hwspinlock.o
 
-obj-y					+= common-board-devices.o twl-common.o
+# nmy add gpmc-16c554.o
+obj-y					+= common-board-devices.o twl-common.o gpmc-16c554.o

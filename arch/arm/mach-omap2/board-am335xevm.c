@@ -59,6 +59,7 @@
 #include <plat/emif.h>
 #include <plat/nand.h>
 #include <linux/lierda_debug.h>
+#include <plat/gpmc-16c554.h>
 
 #include "board-flash.h"
 #include "cpuidle33xx.h"
@@ -512,6 +513,17 @@ static struct pinmux_config nand_pin_mux[] = {
 	{"gpmc_oen_ren.gpmc_oen_ren",	 OMAP_MUX_MODE0 | AM33XX_PULL_DISA},
 	{"gpmc_wen.gpmc_wen",     OMAP_MUX_MODE0 | AM33XX_PULL_DISA},
 	{"gpmc_ben0_cle.gpmc_ben0_cle",	 OMAP_MUX_MODE0 | AM33XX_PULL_DISA},
+	{NULL, 0},
+};
+
+static struct pinmux_config st16c554_pin_mux[] = {
+	{"gpmc_a0.gpmc_a0",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a1.gpmc_a1",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a2.gpmc_a2",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a3.gpmc_a3",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a4.gpmc_a4",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a5.gpmc_a5",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_csn3.gpmc_csn3",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{NULL, 0},
 };
 
@@ -1307,16 +1319,27 @@ static struct gpmc_timings am335x_nand_timings = {
 	.wr_data_mux_bus = 0,
 };
 
+static struct omap_16c554_platform_data board_16c554_data = {
+	.cs		= 3,
+	//.gpio_irq	= 149,
+	//.flags		= GPMC_MUX_ADD_DATA | IORESOURCE_IRQ_LOWLEVEL,
+	.flags		= IORESOURCE_IRQ_LOWLEVEL,
+};
+
 static void evm_nand_init(int evm_id, int profile)
 {
 	struct omap_nand_platform_data *pdata;
-	struct gpmc_devices_info gpmc_device[2] = {
+	struct gpmc_devices_info gpmc_device[3] = {
 		{ NULL, 0 },
+		//{ NULL, 0 },
 		{ NULL, 0 },
 	};
 
 	lsd_dbg(LSD_DBG,"Enter board init:%s\n",__FUNCTION__);
 	setup_pin_mux(nand_pin_mux);
+	lsd_dbg(LSD_DBG,"Init pin st16c554_pin_mux\n");
+	setup_pin_mux(st16c554_pin_mux);
+	lsd_dbg(LSD_DBG,"before pdata = omap_nand_init(am335x_nand_partitions\n");
 	pdata = omap_nand_init(am335x_nand_partitions,
 		ARRAY_SIZE(am335x_nand_partitions), 0, 0,
 		&am335x_nand_timings);
@@ -1327,9 +1350,17 @@ static void evm_nand_init(int evm_id, int profile)
 	gpmc_device[0].pdata = pdata;
 	gpmc_device[0].flag = GPMC_DEVICE_NAND;
 
+	board_16c554_data.cs = 3;
+	gpmc_device[1].pdata = &board_16c554_data;
+	
+
 	omap_init_gpmc(gpmc_device, sizeof(gpmc_device));
 	omap_init_elm();
+
+	
+	gpmc_16c554_init(&board_16c554_data);
 }
+
 
 /* TPS65217 voltage regulator support */
 
