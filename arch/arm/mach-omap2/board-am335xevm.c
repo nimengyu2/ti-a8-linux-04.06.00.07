@@ -523,6 +523,10 @@ static struct pinmux_config st16c554_pin_mux[] = {
 	{"gpmc_a3.gpmc_a3",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{"gpmc_a4.gpmc_a4",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{"gpmc_a5.gpmc_a5",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a6.gpio1_22",	  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a7.gpio1_23",	  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a8.gpio1_24",	  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
+	{"gpmc_a9.gpio1_25",	  OMAP_MUX_MODE7 | AM33XX_PIN_INPUT_PULLUP},
 	{"gpmc_csn3.gpmc_csn3",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{NULL, 0},
 };

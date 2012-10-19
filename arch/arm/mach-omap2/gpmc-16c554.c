@@ -159,7 +159,27 @@ void __init gpmc_16c554_init(struct omap_16c554_platform_data *board_data)
 	unsigned long cs_mem_base;
 	int ret;
 	unsigned long val;
+	int status,i;
+	unsigned int gpio_num[4] = {1*32+22,
+				    1*32+23,
+				    1*32+24,
+				    1*32+25};
 
+	for(i = 0; i < 4; i++)
+	{
+		status = gpio_request(gpio_num[i], "gpio_test\n");
+		if (status < 0) {
+			lsd_dbg(LSD_ERR,"failed to open GPIO %d\n", gpio_num[i]);	
+			return status;
+		}
+		else
+		{
+			lsd_dbg(LSD_OK,"open GPIO %d ok\n", gpio_num[i]);	
+		}
+		gpio_direction_input(gpio_num[i]); 
+		st16c554_platform_data[i].irq =  gpio_to_irq(gpio_num[i]);
+	}
+	
 	gpmc_cfg = board_data;
 	gpmc_cfg->retime = st16c554_gpmc_retime;
 
@@ -178,13 +198,10 @@ void __init gpmc_16c554_init(struct omap_16c554_platform_data *board_data)
 	}
 
 	st16c554_platform_data[0].iobase = ((volatile unsigned long)ioremap(cs_mem_base + 0x00,1));
-	st16c554_platform_data[0].irq =  1*32+22;
 	st16c554_platform_data[1].iobase = ((volatile unsigned long)ioremap(cs_mem_base + 0x08,1));
-	st16c554_platform_data[1].irq =  1*32+23;
 	st16c554_platform_data[2].iobase = ((volatile unsigned long)ioremap(cs_mem_base + 0x20,1));
-	st16c554_platform_data[2].irq =  1*32+24;
 	st16c554_platform_data[3].iobase = ((volatile unsigned long)ioremap(cs_mem_base + 0x28,1));
-	st16c554_platform_data[3].irq =  1*32+25;
+
 	lsd_dbg(LSD_OK,"st16c554_platform_data[0].iobase=0x%08x\n",st16c554_platform_data[0].iobase);
 	lsd_dbg(LSD_OK,"st16c554_platform_data[1].iobase=0x%08x\n",st16c554_platform_data[1].iobase);
 	lsd_dbg(LSD_OK,"st16c554_platform_data[2].iobase=0x%08x\n",st16c554_platform_data[2].iobase);
