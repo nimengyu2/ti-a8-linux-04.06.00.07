@@ -516,6 +516,7 @@ static struct pinmux_config nand_pin_mux[] = {
 	{NULL, 0},
 };
 
+// nmy add for st16c554
 static struct pinmux_config st16c554_pin_mux[] = {
 	{"gpmc_a0.gpmc_a0",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
 	{"gpmc_a1.gpmc_a1",	  OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLUP},
@@ -1323,6 +1324,7 @@ static struct gpmc_timings am335x_nand_timings = {
 	.wr_data_mux_bus = 0,
 };
 
+// nmy add for st16c554
 static struct omap_16c554_platform_data board_16c554_data = {
 	.cs		= 3,
 	//.gpio_irq	= 149,
