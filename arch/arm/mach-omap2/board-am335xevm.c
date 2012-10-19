@@ -39,6 +39,7 @@
 #include <linux/reboot.h>
 #include <linux/pwm/pwm.h>
 
+// 标准的da850的lcd控制器
 /* LCD controller is similar to DA850 */
 #include <video/da8xx-fb.h>
 
