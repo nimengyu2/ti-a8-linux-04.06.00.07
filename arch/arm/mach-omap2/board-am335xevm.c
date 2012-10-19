@@ -1339,6 +1339,7 @@ static void evm_nand_init(int evm_id, int profile)
 	setup_pin_mux(nand_pin_mux);
 	lsd_dbg(LSD_DBG,"Init pin st16c554_pin_mux\n");
 	setup_pin_mux(st16c554_pin_mux);
+
 	lsd_dbg(LSD_DBG,"before pdata = omap_nand_init(am335x_nand_partitions\n");
 	pdata = omap_nand_init(am335x_nand_partitions,
 		ARRAY_SIZE(am335x_nand_partitions), 0, 0,
@@ -1353,11 +1354,9 @@ static void evm_nand_init(int evm_id, int profile)
 	board_16c554_data.cs = 3;
 	gpmc_device[1].pdata = &board_16c554_data;
 	
-
 	omap_init_gpmc(gpmc_device, sizeof(gpmc_device));
 	omap_init_elm();
 
-	
 	gpmc_16c554_init(&board_16c554_data);
 }
 
