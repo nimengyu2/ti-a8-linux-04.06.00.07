@@ -32,6 +32,8 @@
 #include "davinci-pcm.h"
 #include "davinci-mcasp.h"
 
+#include <linux/lierda_debug.h>
+
 /*
  * McASP register definitions
  */
@@ -430,6 +432,7 @@ static void mcasp_stop_tx(struct davinci_audio_dev *dev)
 
 static void davinci_mcasp_stop(struct davinci_audio_dev *dev, int stream)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	if (stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		if (dev->txnumevt) {	/* disable FIFO */
 			if (dev->version == MCASP_VERSION_3)
@@ -458,6 +461,8 @@ static int davinci_mcasp_set_dai_fmt(struct snd_soc_dai *cpu_dai,
 {
 	struct davinci_audio_dev *dev = snd_soc_dai_get_drvdata(cpu_dai);
 	void __iomem *base = dev->base;
+
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	switch (fmt & SND_SOC_DAIFMT_MASTER_MASK) {
 	case SND_SOC_DAIFMT_CBS_CFS:
@@ -546,6 +551,8 @@ static int davinci_config_channel_size(struct davinci_audio_dev *dev,
 	u32 fmt = 0;
 	u32 mask, rotate;
 
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
+
 	switch (channel_size) {
 	case DAVINCI_AUDIO_WORD_8:
 		fmt = 0x03;
@@ -612,6 +619,7 @@ static void davinci_hw_common_param(struct davinci_audio_dev *dev, int stream)
 	int i;
 	u8 tx_ser = 0;
 	u8 rx_ser = 0;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	/* Default configuration */
 	mcasp_set_bits(dev->base + DAVINCI_MCASP_PWREMUMGT_REG, MCASP_SOFT);
@@ -684,6 +692,7 @@ static void davinci_hw_param(struct davinci_audio_dev *dev, int stream)
 {
 	int i, active_slots;
 	u32 mask = 0;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	active_slots = (dev->tdm_slots > 31) ? 32 : dev->tdm_slots;
 	for (i = 0; i < active_slots; i++)
@@ -729,6 +738,7 @@ static void davinci_hw_param(struct davinci_audio_dev *dev, int stream)
 /* S/PDIF */
 static void davinci_hw_dit_param(struct davinci_audio_dev *dev)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	/* Set the PDIR for Serialiser as output */
 	mcasp_set_bits(dev->base + DAVINCI_MCASP_PDIR_REG, AFSX);
 
@@ -769,6 +779,8 @@ static int davinci_mcasp_hw_params(struct snd_pcm_substream *substream,
 					&dev->dma_params[substream->stream];
 	int word_length;
 	u8 fifo_level;
+
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	davinci_hw_common_param(dev, substream->stream);
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
@@ -822,6 +834,7 @@ static int davinci_mcasp_trigger(struct snd_pcm_substream *substream,
 	struct davinci_audio_dev *dev = snd_soc_dai_get_drvdata(cpu_dai);
 	int ret = 0;
 
+	lsd_audio_dbg(LSD_DBG,"enter  %s,cmd=%d\n",__FUNCTION__,cmd);
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_RESUME:
 	case SNDRV_PCM_TRIGGER_START:
@@ -857,6 +870,7 @@ static int davinci_mcasp_startup(struct snd_pcm_substream *substream,
 {
 	struct davinci_audio_dev *dev = snd_soc_dai_get_drvdata(dai);
 
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	snd_soc_dai_set_dma_data(dai, substream, dev->dma_params);
 	return 0;
 }
@@ -914,6 +928,8 @@ static int davinci_mcasp_probe(struct platform_device *pdev)
 	struct snd_platform_data *pdata;
 	struct davinci_audio_dev *dev;
 	int ret = 0;
+	
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	dev = kzalloc(sizeof(struct davinci_audio_dev), GFP_KERNEL);
 	if (!dev)
@@ -1044,6 +1060,7 @@ static int davinci_mcasp_remove(struct platform_device *pdev)
 	struct davinci_audio_dev *dev = dev_get_drvdata(&pdev->dev);
 	struct resource *mem;
 
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	snd_soc_unregister_dai(&pdev->dev);
 	pm_runtime_put_sync(&pdev->dev);
 	pm_runtime_disable(&pdev->dev);
@@ -1062,6 +1079,8 @@ static int davinci_mcasp_suspend(struct platform_device *pdev,
 {
 	int ret = 0, idx;
 	struct davinci_audio_dev *dev = dev_get_drvdata(&pdev->dev);
+
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	if (dev->version == MCASP_VERSION_3) {
 		dev->gblctlx = mcasp_get_reg(dev->base +
@@ -1113,6 +1132,8 @@ static int davinci_mcasp_resume(struct platform_device *pdev)
 {
 	int ret = 0, idx;
 	struct davinci_audio_dev *dev = dev_get_drvdata(&pdev->dev);
+
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	ret = pm_runtime_get_sync(&pdev->dev);
 	if (ret < 0)
@@ -1176,12 +1197,14 @@ static struct platform_driver davinci_mcasp_driver = {
 
 static int __init davinci_mcasp_init(void)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	return platform_driver_register(&davinci_mcasp_driver);
 }
 module_init(davinci_mcasp_init);
 
 static void __exit davinci_mcasp_exit(void)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	platform_driver_unregister(&davinci_mcasp_driver);
 }
 module_exit(davinci_mcasp_exit);

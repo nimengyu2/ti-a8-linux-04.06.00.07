@@ -32,6 +32,7 @@
 #include <sound/soc.h>
 #include <sound/tlv.h>
 #include <sound/initval.h>
+#include <linux/lierda_debug.h>
 
 #include "tlv320aic23.h"
 
@@ -375,6 +376,7 @@ static int tlv320aic23_pcm_prepare(struct snd_pcm_substream *substream,
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_codec *codec = rtd->codec;
 
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	/* set active */
 	snd_soc_write(codec, TLV320AIC23_ACTIVE, 0x0001);
 
@@ -387,6 +389,7 @@ static void tlv320aic23_shutdown(struct snd_pcm_substream *substream,
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_codec *codec = rtd->codec;
 	struct aic23 *aic23 = snd_soc_codec_get_drvdata(codec);
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	/* deactivate */
 	if (!codec->active) {
@@ -403,6 +406,7 @@ static int tlv320aic23_mute(struct snd_soc_dai *dai, int mute)
 {
 	struct snd_soc_codec *codec = dai->codec;
 	u16 reg;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	reg = snd_soc_read(codec, TLV320AIC23_DIGT);
 	if (mute)
@@ -421,6 +425,7 @@ static int tlv320aic23_set_dai_fmt(struct snd_soc_dai *codec_dai,
 {
 	struct snd_soc_codec *codec = codec_dai->codec;
 	u16 iface_reg;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	iface_reg = snd_soc_read(codec, TLV320AIC23_DIGT_FMT) & (~0x03);
 
@@ -539,6 +544,7 @@ static int tlv320aic23_suspend(struct snd_soc_codec *codec,
 
 static int tlv320aic23_resume(struct snd_soc_codec *codec)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);	
 	snd_soc_cache_sync(codec);
 	tlv320aic23_set_bias_level(codec, SND_SOC_BIAS_STANDBY);
 
@@ -549,6 +555,7 @@ static int tlv320aic23_probe(struct snd_soc_codec *codec)
 {
 	struct aic23 *aic23 = snd_soc_codec_get_drvdata(codec);
 	int ret;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	printk(KERN_INFO "AIC23 Audio Codec %s\n", AIC23_VERSION);
 
@@ -632,6 +639,7 @@ static int tlv320aic23_codec_probe(struct i2c_client *i2c,
 {
 	struct aic23 *aic23;
 	int ret;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	if (!i2c_check_functionality(i2c->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EINVAL;
@@ -651,6 +659,7 @@ static int tlv320aic23_codec_probe(struct i2c_client *i2c,
 }
 static int __exit tlv320aic23_i2c_remove(struct i2c_client *i2c)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	snd_soc_unregister_codec(&i2c->dev);
 	kfree(i2c_get_clientdata(i2c));
 	return 0;
@@ -677,6 +686,7 @@ static struct i2c_driver tlv320aic23_i2c_driver = {
 static int __init tlv320aic23_modinit(void)
 {
 	int ret;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 #if defined(CONFIG_I2C) || defined(CONFIG_I2C_MODULE)
 	ret = i2c_add_driver(&tlv320aic23_i2c_driver);
 	if (ret != 0) {
@@ -690,6 +700,7 @@ module_init(tlv320aic23_modinit);
 
 static void __exit tlv320aic23_exit(void)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 #if defined(CONFIG_I2C) || defined(CONFIG_I2C_MODULE)
 	i2c_del_driver(&tlv320aic23_i2c_driver);
 #endif

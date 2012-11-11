@@ -3434,6 +3434,7 @@ int nand_scan_tail(struct mtd_info *mtd)
 	}
 	chip->ecc.total = chip->ecc.steps * chip->ecc.bytes;
 
+#if 0
 	/* Allow subpage writes up to ecc.steps. Not possible for MLC flash */
 	if (!(chip->options & NAND_NO_SUBPAGE_WRITE) &&
 	    !(chip->cellinfo & NAND_CI_CELLTYPE_MSK)) {
@@ -3448,6 +3449,8 @@ int nand_scan_tail(struct mtd_info *mtd)
 			break;
 		}
 	}
+#endif
+
 	chip->subpagesize = mtd->writesize >> mtd->subpage_sft;
 
 	/* Initialize state */

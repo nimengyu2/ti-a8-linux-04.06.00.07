@@ -49,6 +49,7 @@
 #include <sound/initval.h>
 #include <sound/tlv.h>
 #include <sound/tlv320aic3x.h>
+#include <linux/lierda_debug.h>
 
 #include "tlv320aic3x.h"
 
@@ -835,6 +836,7 @@ static int aic3x_hw_params(struct snd_pcm_substream *substream,
 	u16 d, pll_d = 1;
 	u8 reg;
 	int clk;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	/* select data word length */
 	data = snd_soc_read(codec, AIC3X_ASD_INTF_CTRLB) & (~(0x3 << 4));
@@ -980,16 +982,36 @@ found:
 static int aic3x_mute(struct snd_soc_dai *dai, int mute)
 {
 	struct snd_soc_codec *codec = dai->codec;
-	u8 ldac_reg = snd_soc_read(codec, LDAC_VOL) & ~MUTE_ON;
-	u8 rdac_reg = snd_soc_read(codec, RDAC_VOL) & ~MUTE_ON;
+	u8 hpout_reg,left_agc_reg,right_agc_reg;
+
+	u8 ldac_reg = snd_soc_read(codec, LDAC_VOL);
+	u8 rdac_reg = snd_soc_read(codec, RDAC_VOL);
+	lsd_audio_dbg(LSD_DBG,"enter  %s,mute=%d,ldac_reg=0x%04x,rdac_reg=0x%04x\n",__FUNCTION__,mute,ldac_reg,rdac_reg);
+
+	ldac_reg = ldac_reg & (~MUTE_ON);
+	rdac_reg = rdac_reg & (~MUTE_ON);
 
 	if (mute) {
-		snd_soc_write(codec, LDAC_VOL, ldac_reg | MUTE_ON);
-		snd_soc_write(codec, RDAC_VOL, rdac_reg | MUTE_ON);
+		//snd_soc_write(codec, LDAC_VOL, ldac_reg | MUTE_ON);
+		//snd_soc_write(codec, RDAC_VOL, rdac_reg | MUTE_ON);
+		snd_soc_write(codec, LDAC_VOL, 0xFF);
+		snd_soc_write(codec, RDAC_VOL, 0xFF);
+		
 	} else {
 		snd_soc_write(codec, LDAC_VOL, ldac_reg);
 		snd_soc_write(codec, RDAC_VOL, rdac_reg);
 	}
+
+	ldac_reg = snd_soc_read(codec, LDAC_VOL);
+	rdac_reg = snd_soc_read(codec, RDAC_VOL);
+	//snd_soc_write(codec, HPOUT_POP_REDUCTION, 0x50);
+	//snd_soc_write(codec, 34, 0x40);
+	//snd_soc_write(codec, 35, 0x40);
+
+	//hpout_reg = snd_soc_read(codec,HPOUT_POP_REDUCTION);
+	//left_agc_reg = snd_soc_read(codec,34);
+	//right_agc_reg = snd_soc_read(codec,35);
+	lsd_audio_dbg(LSD_DBG,"exit  %s,mute=%d,ldac_reg=0x%04x,rdac_reg=0x%04x,hpout_reg=0x%04x,left_agc_reg=0x%04x,right_agc_reg=0x%04x\n",__FUNCTION__,mute,ldac_reg,rdac_reg,hpout_reg,left_agc_reg,right_agc_reg);
 
 	return 0;
 }
@@ -999,7 +1021,7 @@ static int aic3x_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 {
 	struct snd_soc_codec *codec = codec_dai->codec;
 	struct aic3x_priv *aic3x = snd_soc_codec_get_drvdata(codec);
-
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	aic3x->sysclk = freq;
 	return 0;
 }
@@ -1012,6 +1034,7 @@ static int aic3x_set_dai_fmt(struct snd_soc_dai *codec_dai,
 	u8 iface_areg, iface_breg;
 	int delay = 0;
 
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	iface_areg = snd_soc_read(codec, AIC3X_ASD_INTF_CTRLA) & 0x3f;
 	iface_breg = snd_soc_read(codec, AIC3X_ASD_INTF_CTRLB) & 0x3f;
 
@@ -1064,6 +1087,7 @@ static int aic3x_init_3007(struct snd_soc_codec *codec)
 {
 	u8 tmp1, tmp2, *cache = codec->reg_cache;
 
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	/*
 	 * There is no need to cache writes to undocumented page 0xD but
 	 * respective page 0 register cache entries must be preserved
@@ -1089,6 +1113,7 @@ static int aic3x_regulator_event(struct notifier_block *nb,
 	struct aic3x_disable_nb *disable_nb =
 		container_of(nb, struct aic3x_disable_nb, nb);
 	struct aic3x_priv *aic3x = disable_nb->aic3x;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	if (event & REGULATOR_EVENT_DISABLE) {
 		/*
@@ -1108,6 +1133,7 @@ static int aic3x_set_power(struct snd_soc_codec *codec, int power)
 	struct aic3x_priv *aic3x = snd_soc_codec_get_drvdata(codec);
 	int i, ret;
 	u8 *cache = codec->reg_cache;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	if (power) {
 		ret = regulator_bulk_enable(ARRAY_SIZE(aic3x->supplies),
@@ -1162,6 +1188,7 @@ static int aic3x_set_bias_level(struct snd_soc_codec *codec,
 {
 	struct aic3x_priv *aic3x = snd_soc_codec_get_drvdata(codec);
 	u8 reg;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	switch (level) {
 	case SND_SOC_BIAS_ON:
@@ -1198,6 +1225,7 @@ static int aic3x_set_bias_level(struct snd_soc_codec *codec,
 
 void aic3x_set_gpio(struct snd_soc_codec *codec, int gpio, int state)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	u8 reg = gpio ? AIC3X_GPIO2_REG : AIC3X_GPIO1_REG;
 	u8 bit = gpio ? 3: 0;
 	u8 val = snd_soc_read(codec, reg) & ~(1 << bit);
@@ -1207,6 +1235,7 @@ EXPORT_SYMBOL_GPL(aic3x_set_gpio);
 
 int aic3x_get_gpio(struct snd_soc_codec *codec, int gpio)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	u8 reg = gpio ? AIC3X_GPIO2_REG : AIC3X_GPIO1_REG;
 	u8 val = 0, bit = gpio ? 2 : 1;
 
@@ -1219,6 +1248,7 @@ void aic3x_set_headset_detection(struct snd_soc_codec *codec, int detect,
 				 int headset_debounce, int button_debounce)
 {
 	u8 val;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	val = ((detect & AIC3X_HEADSET_DETECT_MASK)
 		<< AIC3X_HEADSET_DETECT_SHIFT) |
@@ -1236,6 +1266,7 @@ EXPORT_SYMBOL_GPL(aic3x_set_headset_detection);
 
 int aic3x_headset_detected(struct snd_soc_codec *codec)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	u8 val = 0;
 	aic3x_read(codec, AIC3X_HEADSET_DETECT_CTRL_B, &val);
 	return (val >> 4) & 1;
@@ -1244,6 +1275,7 @@ EXPORT_SYMBOL_GPL(aic3x_headset_detected);
 
 int aic3x_button_pressed(struct snd_soc_codec *codec)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	u8 val = 0;
 	aic3x_read(codec, AIC3X_HEADSET_DETECT_CTRL_B, &val);
 	return (val >> 5) & 1;
@@ -1281,6 +1313,7 @@ static struct snd_soc_dai_driver aic3x_dai = {
 
 static int aic3x_suspend(struct snd_soc_codec *codec, pm_message_t state)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	aic3x_set_bias_level(codec, SND_SOC_BIAS_OFF);
 
 	return 0;
@@ -1288,6 +1321,7 @@ static int aic3x_suspend(struct snd_soc_codec *codec, pm_message_t state)
 
 static int aic3x_resume(struct snd_soc_codec *codec)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 	aic3x_set_bias_level(codec, SND_SOC_BIAS_STANDBY);
 
 	return 0;
@@ -1301,6 +1335,7 @@ static int aic3x_init(struct snd_soc_codec *codec)
 {
 	struct aic3x_priv *aic3x = snd_soc_codec_get_drvdata(codec);
 	int reg;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	snd_soc_write(codec, AIC3X_PAGE_SELECT, PAGE0_SELECT);
 	snd_soc_write(codec, AIC3X_RESET, SOFT_RESET);
@@ -1379,6 +1414,7 @@ static int aic3x_init(struct snd_soc_codec *codec)
 static bool aic3x_is_shared_reset(struct aic3x_priv *aic3x)
 {
 	struct aic3x_priv *a;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	list_for_each_entry(a, &reset_list, list) {
 		if (gpio_is_valid(aic3x->gpio_reset) &&
@@ -1393,6 +1429,8 @@ static int aic3x_probe(struct snd_soc_codec *codec)
 {
 	struct aic3x_priv *aic3x = snd_soc_codec_get_drvdata(codec);
 	int ret, i;
+
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	INIT_LIST_HEAD(&aic3x->list);
 	aic3x->codec = codec;
@@ -1472,6 +1510,7 @@ static int aic3x_remove(struct snd_soc_codec *codec)
 {
 	struct aic3x_priv *aic3x = snd_soc_codec_get_drvdata(codec);
 	int i;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	aic3x_set_bias_level(codec, SND_SOC_BIAS_OFF);
 	list_del(&aic3x->list);
@@ -1523,6 +1562,7 @@ static int aic3x_i2c_probe(struct i2c_client *i2c,
 	struct aic3x_pdata *pdata = i2c->dev.platform_data;
 	struct aic3x_priv *aic3x;
 	int ret;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 
 	aic3x = kzalloc(sizeof(struct aic3x_priv), GFP_KERNEL);
 	if (aic3x == NULL) {
@@ -1571,6 +1611,7 @@ static struct i2c_driver aic3x_i2c_driver = {
 static int __init aic3x_modinit(void)
 {
 	int ret = 0;
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 #if defined(CONFIG_I2C) || defined(CONFIG_I2C_MODULE)
 	ret = i2c_add_driver(&aic3x_i2c_driver);
 	if (ret != 0) {
@@ -1584,6 +1625,7 @@ module_init(aic3x_modinit);
 
 static void __exit aic3x_exit(void)
 {
+	lsd_audio_dbg(LSD_DBG,"enter  %s\n",__FUNCTION__);
 #if defined(CONFIG_I2C) || defined(CONFIG_I2C_MODULE)
 	i2c_del_driver(&aic3x_i2c_driver);
 #endif

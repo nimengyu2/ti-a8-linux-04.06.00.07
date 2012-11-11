@@ -1283,7 +1283,7 @@ static struct mtd_partition am335x_nand_partitions[] = {
 		//.name           = "File System",
 		.name           = "rootfs",
 		.offset         = MTDPART_OFS_APPEND,   /* Offset = 0x780000 */
-		.size           = MTDPART_SIZ_FULL,
+		.size           = 200*SZ_1M,//MTDPART_SIZ_FULL,
 	},
 };
 #endif
@@ -1374,6 +1374,7 @@ static struct spi_board_info am335x_spi1_slave_info[] = {
 	},
 };
 
+#if 1
 static struct gpmc_timings am335x_nand_timings = {
 	.sync_clk = 0,
 
@@ -1394,6 +1395,29 @@ static struct gpmc_timings am335x_nand_timings = {
 	.wr_access = 40,
 	.wr_data_mux_bus = 0,
 };
+#endif
+#if 0
+static struct gpmc_timings am335x_nand_timings = {
+	.sync_clk = 0,
+
+	.cs_on = 10,
+	.cs_rd_off = 44*2,
+	.cs_wr_off = 44*2,
+
+	.adv_on = 6*2,
+	.adv_rd_off = 34*2,
+	.adv_wr_off = 44*2,
+	.we_off = 40*2,
+	.oe_off = 54*2,
+
+	.access = 64*2,
+	.rd_cycle = 82*2,
+	.wr_cycle = 82*2,
+
+	.wr_access = 40*2,
+	.wr_data_mux_bus = 10,
+};
+#endif
 
 static void evm_nand_init(int evm_id, int profile)
 {
@@ -1410,6 +1434,7 @@ static void evm_nand_init(int evm_id, int profile)
 		&am335x_nand_timings);
 	if (!pdata)
 		return;
+	//pdata->ecc_opt =OMAP_ECC_HAMMING_CODE_HW_ROMCODE;
 	pdata->ecc_opt =OMAP_ECC_BCH8_CODE_HW;
 	pdata->elm_used = true;
 	gpmc_device[0].pdata = pdata;
