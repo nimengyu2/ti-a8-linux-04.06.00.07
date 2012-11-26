@@ -338,26 +338,26 @@ static irqreturn_t tscadc_interrupt(int irq, void *dev)
 			 * Don't report it to user space.
 			 */
 			if (pen == 0) {
-#if 0
+#if 1
 				if ((diffx < 15) && (diffy < 15)
 						&& (z <= MAX_12BIT)) {
 
 					input_report_abs(input_dev, ABS_X,
-							val_x);
+							val_x >> 2);
 					input_report_abs(input_dev, ABS_Y,
-							val_y);
+							val_y >> 2);
 					input_report_abs(input_dev, ABS_PRESSURE,
 							z);
 					input_report_key(input_dev, BTN_TOUCH,
 							1);
 					input_sync(input_dev);
-					#if 1
+					#if 0
 					printk("x=%d,y=%d,p=%d\n",val_x,val_y,z);
 					#endif
 				}
 #endif
 
-#if 1
+#if 0
 				if ((diffx < 30) && (diffy < 30)
 					&& (z <= MAX_12BIT)) {
 					// nmy modify
