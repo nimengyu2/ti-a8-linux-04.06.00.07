@@ -27,6 +27,7 @@
 #define M_LSD_ETH_DBG  1
 #define M_LSD_MMC_DBG  1
 #define M_LSD_USB_DBG  1
+#define M_LSD_TS_DBG  1
 
 
 // all debug
