@@ -5,6 +5,10 @@ ARCH=arm
 DEFAULT_CONFIG=""
 
 case "$1" in
+    menuconfig)
+        echo "Starting $SRC make menuconfig CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH"
+        make CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH menuconfig
+        ;;
     clean|c)
         echo "Starting $SRC make clean CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH"
         make CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH clean

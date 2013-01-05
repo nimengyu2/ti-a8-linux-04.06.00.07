@@ -2338,7 +2338,7 @@ static struct omap_musb_board_data musb_board_data = {
 	 * AM335X beta EVM has USB0 in OTG mode and USB1 in host mode.
 	 */
 	//.mode           = (MUSB_HOST << 4) | MUSB_OTG,
-	.mode           = (MUSB_HOST << 4) | MUSB_HOST,
+	.mode           = (MUSB_HOST << 4) | MUSB_OTG,
 	.power		= 500,
 	.instances	= 1,
 };
