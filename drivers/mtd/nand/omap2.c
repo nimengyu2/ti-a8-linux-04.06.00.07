@@ -1013,9 +1013,11 @@ static int omap_wait(struct mtd_info *mtd, struct nand_chip *chip)
 	int status = NAND_STATUS_FAIL, state = this->state;
 
 	if (state == FL_ERASING)
-		timeo += (HZ * 400) / 1000;
+		//timeo += (HZ * 400) / 1000;
+		timeo += (HZ * 4000) / 1000;
 	else
-		timeo += (HZ * 20) / 1000;
+		//timeo += (HZ * 20) / 1000;
+		timeo += (HZ * 1000) / 1000;
 
 	gpmc_nand_write(info->gpmc_cs,
 			GPMC_NAND_COMMAND, (NAND_CMD_STATUS & 0xFF));
