@@ -17,6 +17,10 @@ case "$1" in
         echo "Starting $SRC make modules CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH"
         make CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH modules
         ;;
+    menuconfig)
+        echo "Starting $SRC make modules CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH"
+        make CROSS_COMPILE=$CROSS_COMPILE ARCH=$ARCH menuconfig
+        ;;
     minstall|mi)
 	if [ $# -lt 2 ];then
 	echo "Usage: $0 minstall|mi PATH"
