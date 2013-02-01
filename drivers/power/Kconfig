@@ -250,4 +250,10 @@ config CHARGER_MAX8998
 	  Say Y to enable support for the battery charger control sysfs and
 	  platform data of MAX8998/LP3974 PMICs.
 
+config POWER_AS3711
+       tristate "AS3711 power supply and charger support"
+       depends on MFD_AS3711
+       help
+        Say Y to include support for the AS3711 power supply and charger.
+
 endif # POWER_SUPPLY

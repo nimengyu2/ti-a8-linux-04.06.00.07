@@ -17,6 +17,7 @@
 #include <linux/i2c.h>
 #include <linux/module.h>
 #include <linux/i2c/at24.h>
+#include <linux/mfd/as3711.h>
 #include <linux/phy.h>
 #include <linux/gpio.h>
 #include <linux/spi/spi.h>
@@ -1331,6 +1332,377 @@ static void evm_nand_init(int evm_id, int profile)
 	omap_init_elm();
 }
 
+
+/* AS3711 platform setup */
+
+static struct regulator_consumer_supply as3711_ldo1_supply = {
+	.supply = "as3711-ldo1",
+};
+
+static struct regulator_consumer_supply as3711_ldo2_supply = {
+	.supply = "as3711-ldo2",
+};
+
+static struct regulator_consumer_supply as3711_ldo3_supply = {
+	.supply = "as3711-ldo3",
+};
+
+static struct regulator_consumer_supply as3711_ldo4_supply = {
+	.supply = "as3711-ldo4",
+};
+
+static struct regulator_consumer_supply as3711_ldo5_supply = {
+	.supply = "as3711-ldo5",
+};
+
+static struct regulator_consumer_supply as3711_ldo6_supply = {
+	.supply = "as3711-ldo6",
+};
+
+static struct regulator_consumer_supply as3711_ldo7_supply = {
+	.supply = "as3711-ldo7",
+};
+
+static struct regulator_consumer_supply as3711_ldo8_supply = {
+	.supply = "as3711-ldo8",
+};
+
+static struct regulator_consumer_supply as3711_sd1_supply = {
+	.supply = "as3711-sd1",
+};
+
+static struct regulator_consumer_supply as3711_sd2_supply = {
+	.supply = "as3711-sd2",
+};
+
+static struct regulator_consumer_supply as3711_sd3_supply = {
+	.supply = "as3711-sd3",
+};
+
+static struct regulator_consumer_supply as3711_sd4_supply = {
+	.supply = "as3711-sd4",
+};
+
+static struct regulator_consumer_supply as3711_su1_supply = {
+	.supply = "as3711-su1",
+};
+
+static struct regulator_consumer_supply as3711_su2_supply = {
+	.supply = "as3711-su2",
+};
+
+static struct regulator_consumer_supply as3711_curr1_supply = {
+	.supply = "as3711-curr1",
+};
+
+static struct regulator_consumer_supply as3711_curr2_supply = {
+	.supply = "as3711-curr2",
+};
+
+static struct regulator_consumer_supply as3711_curr3_supply = {
+	.supply = "as3711-curr3",
+};
+
+static struct regulator_init_data as3711_ldo1_ana = {
+	.constraints = {
+			.min_uV = 1200000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 250000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo1_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_ldo2_ana = {
+	.constraints = {
+			.min_uV = 1200000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 250000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo2_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_ldo3_dig = {
+	.constraints = {
+			.min_uV = 900000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 300000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo3_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_ldo4_dig = {
+	.constraints = {
+			.min_uV = 900000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 300000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo4_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_ldo5_dig = {
+	.constraints = {
+			.min_uV = 900000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 300000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo5_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_ldo6_dig = {
+	.constraints = {
+			.min_uV = 900000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 300000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo6_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_ldo7_dig = {
+	.constraints = {
+			.min_uV = 900000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 300000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo7_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_ldo8_dig = {
+	.constraints = {
+			.min_uV = 900000,
+			.max_uV = 3300000,
+			.min_uA = 150000,
+			.max_uA = 300000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_CURRENT,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_ldo8_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_sd1 = {
+	.constraints = {
+			.min_uV = 612500,
+			.max_uV = 3350000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL
+			| REGULATOR_MODE_FAST,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_MODE,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_sd1_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_sd2 = {
+	.constraints = {
+			.min_uV = 612500,
+			.max_uV = 3350000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL
+			| REGULATOR_MODE_FAST,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_MODE,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_sd2_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_sd3 = {
+	.constraints = {
+			.min_uV = 612500,
+			.max_uV = 3350000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL
+			| REGULATOR_MODE_FAST,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_MODE,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_sd3_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_sd4 = {
+	.constraints = {
+			.min_uV = 612500,
+			.max_uV = 3350000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL
+			| REGULATOR_MODE_FAST,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_VOLTAGE | REGULATOR_CHANGE_MODE,
+			.apply_uV = 1,
+			},
+	.consumer_supplies = &as3711_sd4_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_su1 = {
+	.constraints = {
+			.min_uV = 5038000,
+			.max_uV = 5038000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS,
+			},
+	.consumer_supplies = &as3711_su1_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_su2 = {
+	.constraints = {
+			.min_uV = 13750000,
+			.max_uV = 13750000,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS,
+			},
+	.consumer_supplies = &as3711_su2_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_curr1 = {
+	.constraints = {
+			.min_uA = 0,
+			.max_uA = 38250,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_CURRENT,
+			},
+	.consumer_supplies = &as3711_curr1_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_curr2 = {
+	.constraints = {
+			.min_uA = 0,
+			.max_uA = 38250,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_CURRENT,
+			},
+	.consumer_supplies = &as3711_curr2_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct regulator_init_data as3711_curr3 = {
+	.constraints = {
+			.min_uA = 0,
+			.max_uA = 38250,
+			.valid_modes_mask = REGULATOR_MODE_NORMAL,
+			.valid_ops_mask = REGULATOR_CHANGE_STATUS
+			| REGULATOR_CHANGE_CURRENT,
+			},
+	.consumer_supplies = &as3711_curr3_supply,
+	.num_consumer_supplies = 1,
+};
+
+static struct as3711_reg_init as3711_core_init_data[] = {
+	/* GPIO1 */
+	AS3711_REG_INIT(0x0C, 0x8A),
+
+	/* SU1, select external resistor devider */
+	AS3711_REG_INIT(0x50, 0x04),
+
+	/* SU2, select external resistor devider */
+	AS3711_REG_INIT(0x51, 0x04),
+
+	/* SU2, select external resistor devider */
+	AS3711_REG_INIT(0x52, 0x04),
+
+	/* disable step down regulators */
+	AS3711_REG_INIT(0x10, 0x00),
+
+	/* Chargercontrol1 */
+	AS3711_REG_INIT(0x80, 0xe1),
+
+	/* Chargerconfig */
+	AS3711_REG_INIT(0x83, 0x45),
+
+	{.reg = AS3711_REG_INIT_TERMINATE},
+};
+
+static struct as3711_reg_init as3711_power_init_data[] = {
+	/* GPIO2 */
+	AS3711_REG_INIT(0x0D, 0x51),
+
+	/* Chargercontrol1 */
+	AS3711_REG_INIT(0x80, 0xe1),
+
+	/* Chargerconfig */
+	AS3711_REG_INIT(0x83, 0x45),
+
+	{.reg = AS3711_REG_INIT_TERMINATE},
+};
+
+static struct as3711_platform_data as3711_pdata = {
+	.reg_init[AS3711_LDO1_ANA] = &as3711_ldo1_ana,
+	.reg_init[AS3711_LDO2_ANA] = &as3711_ldo2_ana,
+	.reg_init[AS3711_LDO3_DIG] = &as3711_ldo3_dig,
+	.reg_init[AS3711_LDO4_DIG] = &as3711_ldo4_dig,
+	.reg_init[AS3711_LDO5_DIG] = &as3711_ldo5_dig,
+	.reg_init[AS3711_LDO6_DIG] = &as3711_ldo6_dig,
+	.reg_init[AS3711_LDO7_DIG] = &as3711_ldo7_dig,
+	.reg_init[AS3711_LDO8_DIG] = &as3711_ldo8_dig,
+
+	.reg_init[AS3711_SD1] = &as3711_sd1,
+	.reg_init[AS3711_SD2] = &as3711_sd2,
+	.reg_init[AS3711_SD3] = &as3711_sd3,
+	.reg_init[AS3711_SD4] = &as3711_sd4,
+
+	.reg_init[AS3711_SU1] = &as3711_su1,
+	.reg_init[AS3711_SU2] = &as3711_su2,
+
+	.reg_init[AS3711_CURR1] = &as3711_curr1,
+	.reg_init[AS3711_CURR2] = &as3711_curr2,
+	.reg_init[AS3711_CURR3] = &as3711_curr3,
+
+	.core_init_data = &as3711_core_init_data[0],
+	.pwr_init_data = &as3711_power_init_data[0],
+	//.gpio_base = OMAP_MAX_GPIO_LINES + TWL4030_GPIO_MAX + 2,
+	.rtc_start_year = 2010,
+};
+
 /* TPS65217 voltage regulator support */
 
 /* 1.8V */
@@ -2315,6 +2687,12 @@ static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 		/* Baseboard board EEPROM */
 		I2C_BOARD_INFO("24c256", BASEBOARD_I2C_ADDR),
 		.platform_data  = &am335x_baseboard_eeprom_info,
+	},
+	{
+		I2C_BOARD_INFO("as3711", 0x40),
+		.flags = I2C_CLIENT_WAKE,
+		.irq = 0,
+		.platform_data = &as3711_pdata,
 	},
 #if 0
 	{

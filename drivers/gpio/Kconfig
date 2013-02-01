@@ -489,4 +489,11 @@ config GPIO_TPS65910
 	help
 	  Select this option to enable GPIO driver for the TPS65910
 	  chip family.
+
+config GPIO_AS3711
+       tristate "AS3711 GPIOs"
+       depends on MFD_AS3711
+       help
+         This option enables support for GPIOs on AS3711 PMIC from
+         ams AG.
 endif

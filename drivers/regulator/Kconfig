@@ -142,6 +142,13 @@ config REGULATOR_TWL4030
 	  This driver supports the voltage regulators provided by
 	  this family of companion chips.
 
+config REGULATOR_AS3711
+       tristate "ams AG AS3711 PMIC"
+       depends on MFD_AS3711
+       help
+         This driver provides support for the voltage regulators of the
+         AS3011 PMIC.
+
 config REGULATOR_WM831X
 	tristate "Wolfson Microelcronics WM831x PMIC regulators"
 	depends on MFD_WM831X
