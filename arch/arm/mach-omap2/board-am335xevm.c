@@ -1556,6 +1556,7 @@ static struct i2c_board_info am335x_i2c_boardinfo1[] = {
 	{
 		I2C_BOARD_INFO("tmp275", 0x48),
 	},
+
 };
 
 static void i2c1_init(int evm_id, int profile)
@@ -2323,11 +2324,12 @@ static struct i2c_board_info __initdata am335x_i2c_boardinfo[] = {
 	{
 		I2C_BOARD_INFO("tlc59108", 0x40),
 	},
+#endif
 	{
 		I2C_BOARD_INFO("tps65910", TPS65910_I2C_ID1),
 		.platform_data  = &am335x_tps65910_info,
 	},
-#endif
+
 };
 
 static struct omap_musb_board_data musb_board_data = {
