@@ -23,6 +23,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  */
+#define DEBUG 1
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/io.h>

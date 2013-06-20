@@ -248,7 +248,7 @@ static struct snd_platform_data am335x_evm_snd_data0 = {
 	.num_serializer	= ARRAY_SIZE(am335x_iis_serializer_direction0),
 	.tdm_slots	= 2,
 	.serial_dir	= am335x_iis_serializer_direction0,
-	.asp_chan_q	= EVENTQ_1,
+	.asp_chan_q	= EVENTQ_2,
 	.version	= MCASP_VERSION_3,
 	.txnumevt	= 1,
 	.rxnumevt	= 1,
@@ -654,6 +654,7 @@ static struct pinmux_config mcasp1_pin_mux[] = {
 // nmy add 
 /* Module pin mux for mcasp0 */
 static struct pinmux_config mcasp0_pin_mux[] = {
+	{"mcasp0_ahclkx.mcasp0_ahclkx", OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT},
 	{"mcasp0_fsx.mcasp0_fsx", 	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
 	{"mcasp0_aclkx.mcasp0_aclkx", 	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
 	{"mcasp0_axr0.mcasp0_axr0", 	OMAP_MUX_MODE0 | AM33XX_PIN_INPUT_PULLDOWN},
@@ -997,7 +998,7 @@ static struct pinmux_config uart1_wl12xx_pin_mux[] = {
 static struct pinmux_config wl12xx_pin_mux_evm_rev1_1a[] = {
 	{"gpmc_a0.gpio1_16", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
 	{"mcasp0_ahclkr.gpio3_17", OMAP_MUX_MODE7 | AM33XX_PIN_INPUT},
-	{"mcasp0_ahclkx.gpio3_21", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
+	//{"mcasp0_ahclkx.gpio3_21", OMAP_MUX_MODE7 | AM33XX_PIN_OUTPUT},
 	{NULL, 0},
  };
 
@@ -1776,7 +1777,7 @@ static void wl12xx_init(int evm_id, int profile)
 	/* Register WLAN and BT enable pins based on the evm board revision */
 	if (gp_evm_revision == GP_EVM_REV_IS_1_1A) {
 		am335xevm_wlan_data.wlan_enable_gpio = GPIO_TO_PIN(1, 16);
-		am335xevm_wlan_data.bt_enable_gpio = GPIO_TO_PIN(3, 21);
+		am335xevm_wlan_data.bt_enable_gpio = GPIO_TO_PIN(1, 16);
 	}
 	else {
 		am335xevm_wlan_data.wlan_enable_gpio = GPIO_TO_PIN(1, 30);

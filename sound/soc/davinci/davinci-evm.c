@@ -57,8 +57,8 @@ static int evm_hw_params(struct snd_pcm_substream *substream,
 		sysclk = 24576000;
 	/* On AM335X, CODEC gets MCLK from external Xtal (12MHz). */
 	else if (machine_is_am335xevm())
-		sysclk = 12000000;
-
+		//sysclk = 12000000;
+		sysclk = 26000000;
 	else
 		return -EINVAL;
 
